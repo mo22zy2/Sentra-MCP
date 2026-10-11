@@ -3,7 +3,7 @@
   "mcp": {
     "sentra": {
       "type": "local",
-      "command": ["uv", "--directory", "<ABSOLUTE_PATH_TO_SENTRA_REPO>", "run", "sentra"],
+      "command": ["uvx", "sentra-mcp"],
       "environment": {
         "SENTRA_COURSE_DIR": "<ABSOLUTE_PATH_TO_COURSE_FOLDER>"
       },

@@ -73,20 +73,15 @@ export function Install() {
               <div className="mt-6 space-y-4">
                 {step === 2 && (
                   <>
-                    <CodeBlock label="terminal" code={INSTALL_COMMANDS.condaCreate} />
-                    <CodeBlock label="terminal" code={INSTALL_COMMANDS.condaActivate} />
-                    <CodeBlock label="terminal" code={INSTALL_COMMANDS.pipUv} />
-                    <CodeBlock label="terminal" code={INSTALL_COMMANDS.cdRepo} />
-                    <CodeBlock label="terminal — Windows" code={INSTALL_COMMANDS.uvSync_win} />
-                    <CodeBlock label="terminal — macOS/Linux" code={INSTALL_COMMANDS.uvSync_unix} />
+                    <CodeBlock label="terminal — Windows" code={INSTALL_COMMANDS.installUvWin} />
+                    <CodeBlock label="terminal — otherwise" code={INSTALL_COMMANDS.installUvAlt} />
+                    <CodeBlock label="terminal" code={INSTALL_COMMANDS.init} />
                   </>
                 )}
                 {step === 3 && <CodeBlock label="opencode.json" code={OPENCODE_CONFIG_JSON} />}
                 {step === 4 && <CodeBlock label="folder structure" code={FOLDER_TREE} />}
                 {step === 5 && (
                   <>
-                    <CodeBlock label="terminal" code={INSTALL_COMMANDS.verifyImport} />
-                    <CodeBlock label="terminal" code={INSTALL_COMMANDS.verifyTests} />
                     <div className="rounded-xl border border-line bg-mist/70 p-4 text-[15px] text-ink">
                       {t.install.firstRunPrompt}
                       <InlineCopy text={t.install.firstRunPrompt} />

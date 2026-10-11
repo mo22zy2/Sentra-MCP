@@ -608,7 +608,7 @@ wheels = [
 ]
 
 [[package]]
-name = "sentra"
+name = "sentra-mcp"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

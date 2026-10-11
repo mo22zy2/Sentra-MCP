@@ -15,27 +15,28 @@ by Sentra.
 
 Bilingual product site + docs: [`landing/`](landing/) (English / Egyptian Arabic).
 
-## Fastest start: copy one prompt, OpenCode does the rest
+## Fastest start: two commands, OpenCode does the rest
 
-No manual setup needed. Paste this into OpenCode and the agent will download
-Sentra, install it, configure everything on your machine, and verify it works:
+Prerequisite (once): install `uv` — Windows: `winget install -e --id astral-sh.uv`,
+macOS/Linux or any Python: `pip install uv`.
+
+```bash
+uvx sentra-mcp init
+```
+
+`init` creates your course folder, adds Sentra to your `opencode.json`
+(backing it up first, never deleting your other settings), and tells you
+where to drop PDFs — in plain words. Then open OpenCode and paste:
 
 ```text
-You are setting up Sentra for a non-technical student on their own computer. Do every step below yourself — never ask the student to run commands or edit files.
+Verify the 5 sentra tools work, then analyze my past exams and summarize the professor's question patterns.
+```
 
-GOAL: Install Sentra (a local-first MCP server for mock exams), register it in OpenCode, and verify it works. Everything stays on this machine. NEVER upload the student's files anywhere.
+Or skip the terminal entirely: paste this into OpenCode and the agent will
+run the setup for you:
 
-STEPS:
-1. Get Sentra: `git clone https://github.com/mo22zy2/Sentra-MCP.git` (into ~/Documents/Sentra, or use the current folder if it is empty). If git is missing, download the ZIP from https://github.com/mo22zy2/Sentra-MCP and extract it.
-2. Install: make sure Python 3.11+ is available (create a conda env named mcp with Python 3.11 if needed), install uv via `pip install uv` if missing, then run `uv sync` inside the repo. Verify with `uv run pytest -q` (expect 26 passed).
-3. Configure OpenCode WITHOUT deleting anything: open the user's OpenCode config file (opencode.json) and ADD this block under "mcp" (create "mcp" if it is missing, keep every other key untouched):
-   "sentra": { "type": "local", "command": ["uv", "--directory", "<ABSOLUTE_REPO_PATH>", "run", "sentra"], "environment": { "SENTRA_COURSE_DIR": "<ABSOLUTE_COURSE_PATH>" }, "enabled": true, "timeout": 30000 }
-   Replace <ABSOLUTE_REPO_PATH> and <ABSOLUTE_COURSE_PATH> with real absolute paths on this machine.
-4. Create the course folder (default: OS-Course next to the repo) with subfolders lectures/, past_exams/, output/.
-5. Verify: confirm the 5 sentra tools are available to you now: list_course_pdfs, extract_pdf_text, analyze_past_exams, prepare_exam_brief, save_exam_files.
-6. Tell the student (in their language, in simple words): where to drop lecture PDFs and past exams, then offer to analyze them right away.
-
-RULES: If any step fails, fix it yourself or explain the single next action in plain words. Never invent URLs, commands, or config keys. Never send files to any external server.
+```text
+Install Sentra on this computer: make sure `uv` is installed (install it if missing), then run `uvx sentra-mcp init` to configure OpenCode and create my course folder. Verify the 5 sentra tools are available, then tell me where to drop my lecture PDFs and past exams, in simple words. Never upload my files anywhere.
 ```
 
 Then drop lecture PDFs into `lectures/`, past exams into `past_exams/`, and ask:
@@ -62,7 +63,7 @@ Verify (tested on Python 3.11.17, MCP SDK 2.3.0, PyMuPDF 1.28.2):
 
 ```bash
 uv run python -c "from mcp.server import MCPServer; import pymupdf; print('ok')"
-uv run pytest -q               # expect: 26 passed
+uv run pytest -q               # expect: 30 passed
 ```
 
 ### OpenCode configuration
@@ -79,7 +80,7 @@ uv run pytest -q               # expect: 26 passed
   "mcp": {
     "sentra": {
       "type": "local",
-      "command": ["uv", "--directory", "<ABSOLUTE_PATH_TO_SENTRA_REPO>", "run", "sentra"],
+      "command": ["uvx", "sentra-mcp"],
       "environment": { "SENTRA_COURSE_DIR": "<ABSOLUTE_PATH_TO_COURSE_FOLDER>" },
       "enabled": true,
       "timeout": 30000
@@ -87,6 +88,11 @@ uv run pytest -q               # expect: 26 passed
   }
 }
 ```
+
+(`uvx` fetches `sentra-mcp` from PyPI on first run — no clone needed.
+Developers running from source can use
+`["uv", "--directory", "<ABSOLUTE_PATH_TO_SENTRA_REPO>", "run", "sentra"]`
+instead.)
 
 Verified against https://opencode.ai/docs/mcp-servers: `type: "local"`
 + `command[]` array, absolute `--directory`, `environment` for the course dir
@@ -154,8 +160,9 @@ uv run pytest -q
 
 Covers extraction, empty/corrupt PDFs, page refs, dir validation, traversal
 blocks, input/spec/output validation, key separation, filename collisions,
-and MCP registration via in-memory `Client(mcp)`. Fixtures are synthetic —
-never commit private materials (see `.gitignore`: course PDFs are excluded).
+`init` config merge + backups, and MCP registration via in-memory `Client(mcp)`.
+Fixtures are synthetic — never commit private materials (see `.gitignore`:
+course PDFs are excluded).
 
 ## Contributing
 

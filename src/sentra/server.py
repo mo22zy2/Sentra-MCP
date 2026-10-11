@@ -7,7 +7,7 @@ from typing import Annotated
 from mcp.server import MCPServer
 from pydantic import Field
 
-from . import analysis_prep, course_store, exam_files, exam_spec, pdf_reader, settings
+from . import analysis_prep, course_store, exam_files, exam_spec, init_cmd, pdf_reader, settings
 
 mcp = MCPServer("sentra")
 
@@ -127,6 +127,26 @@ def save_exam_files(
 
 
 def main() -> None:
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(
+        prog="sentra-mcp",
+        description="Sentra — local-first MCP server for mock exam generation.",
+    )
+    parser.add_argument(
+        "command",
+        nargs="?",
+        default="serve",
+        choices=["serve", "init"],
+        help="'serve' starts the MCP server (default); 'init' sets up course folders + OpenCode config.",
+    )
+    parser.add_argument("--course-dir", default=None, help="Course folder for 'init' (default: ~/Documents/OS-Course).")
+    parser.add_argument("--config", default=None, help="OpenCode config file for 'init' (default: auto-detect).")
+    args = parser.parse_args()
+
+    if args.command == "init":
+        sys.exit(init_cmd.run_init(course_dir=args.course_dir, config=args.config))
     mcp.run()
 
 
