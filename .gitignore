@@ -1,0 +1,20 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Student materials — never commit private PDFs
+OS-Course/**/*.pdf
+OS-Course/**/*.PDF
+
+# Frontend
+landing/node_modules/
+landing/dist/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

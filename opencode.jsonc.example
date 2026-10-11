@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "sentra": {
+      "type": "local",
+      "command": ["uv", "--directory", "<ABSOLUTE_PATH_TO_SENTRA_REPO>", "run", "sentra"],
+      "environment": {
+        "SENTRA_COURSE_DIR": "<ABSOLUTE_PATH_TO_COURSE_FOLDER>"
+      },
+      "enabled": true,
+      "timeout": 30000
+    }
+  }
+}
