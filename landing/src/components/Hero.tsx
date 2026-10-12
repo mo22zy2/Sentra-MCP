@@ -92,7 +92,7 @@ export function Hero() {
             <br />
             <span className="relative inline-block text-navy">
               {t.hero.headlineB}
-              <svg viewBox="0 0 300 16" className="absolute -bottom-4 start-0 w-full overflow-visible" aria-hidden="true" preserveAspectRatio="none">
+              <svg viewBox="0 0 300 16" className="absolute -bottom-6 start-0 w-full overflow-visible" aria-hidden="true" preserveAspectRatio="none">
                 <path d="M4 9 C 80 3, 220 3, 296 8" fill="none" stroke="#FFD43B" strokeWidth="4.5" strokeLinecap="round" />
               </svg>
             </span>
