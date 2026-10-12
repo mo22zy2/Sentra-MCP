@@ -1,4 +1,5 @@
-"""Sentra MCP server (stdio). Document extraction + file ops; LLM reasons client-side."""
+"""Sentra MCP server (stdio). Prompts-first: the user's pipeline prompts are
+the core workflow; tools supply evidence and save files. LLM reasons client-side."""
 
 from __future__ import annotations
 
@@ -7,9 +8,145 @@ from typing import Annotated
 from mcp.server import MCPServer
 from pydantic import Field
 
-from . import agents, analysis_prep, course_store, exam_files, exam_spec, init_cmd, pdf_reader, settings
+from . import agents, analysis_prep, course_store, exam_files, exam_spec, init_cmd, pdf_reader, pipeline_files, settings, workflow_prompts
 
 mcp = MCPServer("sentra")
+
+
+# --- Prompts-first: the pipeline prompts are the core ---------------------
+
+@mcp.prompt(
+    name="extract_text",
+    description="Step 1: how to read every PDF faithfully before anything else.",
+)
+def extract_text_prompt() -> str:
+    """Step 1 prompt (verbatim)."""
+    return workflow_prompts.get_prompt_text("extract_text")
+
+
+@mcp.prompt(
+    name="knowledge_base",
+    description="Step 2: build knowledge_base.md from lectures (complete, not summary).",
+)
+def knowledge_base_prompt() -> str:
+    """Step 2 prompt (verbatim)."""
+    return workflow_prompts.get_prompt_text("knowledge_base")
+
+
+@mcp.prompt(
+    name="professor_dna",
+    description="Step 3: build professor_dna.md from past exams (behavior model).",
+)
+def professor_dna_prompt() -> str:
+    """Step 3 prompt (verbatim)."""
+    return workflow_prompts.get_prompt_text("professor_dna")
+
+
+@mcp.prompt(
+    name="exam_targets",
+    description="Step 4: build exam_targets.md from knowledge_base + professor_dna.",
+)
+def exam_targets_prompt() -> str:
+    """Step 4 prompt (verbatim)."""
+    return workflow_prompts.get_prompt_text("exam_targets")
+
+
+@mcp.prompt(
+    name="predicted_exam",
+    description="Step 5: build predicted_exam.md from the three files above.",
+)
+def predicted_exam_prompt() -> str:
+    """Step 5 prompt (verbatim)."""
+    return workflow_prompts.get_prompt_text("predicted_exam")
+
+
+@mcp.resource(
+    "prompt://{name}",
+    mime_type="text/markdown",
+    description="Raw pipeline prompt text (verbatim).",
+)
+def workflow_prompt_resource(name: str) -> str:
+    """Read one pipeline prompt as a resource."""
+    return workflow_prompts.get_prompt_text(name)
+
+
+@mcp.tool()
+def list_workflow_prompts() -> dict:
+    """List the prompts-first pipeline in order (names, output files, usage).
+
+    Start here: run the prompts in order; tools only supply evidence.
+    The user just drops PDFs into lectures/ and past_exams/.
+    """
+    return {"pipeline": workflow_prompts.describe_pipeline()}
+
+
+@mcp.tool()
+def get_workflow_prompt(
+    name: Annotated[str, Field(description="Prompt name: extract_text, knowledge_base, professor_dna, exam_targets, predicted_exam.")],
+) -> dict:
+    """Get one pipeline prompt text verbatim (no schema, agent infers structure).
+
+    OCR note: server extraction has no OCR — scanned PDFs return
+    insufficient_text=true; never invent text for them.
+    """
+    text = workflow_prompts.get_prompt_text(name)
+    writes = next(
+        (s["writes"] for s in workflow_prompts.describe_pipeline() if s["name"] == name),
+        None,
+    )
+    note = None
+    if name == "extract_text":
+        note = (
+            "Server has no OCR: extract_pdf_text reports insufficient_text for "
+            "scanned PDFs instead of inventing text. Use a text-based export."
+        )
+    return {
+        "name": name,
+        "writes": writes,
+        "next": workflow_prompts.next_step(name),
+        "text": text,
+        "note": note,
+    }
+
+
+@mcp.tool()
+def save_pipeline_file(
+    filename: Annotated[str, Field(description="Pipeline file: knowledge_base.md, professor_dna.md, exam_targets.md, predicted_exam.md. Saved under output/.")],
+    markdown: Annotated[str, Field(description="Free-form markdown produced from the corresponding prompt (structure inferred from prompt, not validated).")],
+    overwrite: Annotated[bool, Field(description="Must be true to replace an existing file.")] = False,
+    course_dir: Annotated[str | None, Field(description="Optional course dir override.")] = None,
+) -> dict:
+    """Save one pipeline markdown file (schemaless, prompt defines structure).
+
+    Only safety checks: known filename, non-empty, size cap, stay inside
+    course dir, no silent overwrite.
+    """
+    course = course_store.resolve_course_dir(course_dir)
+    return pipeline_files.save_pipeline_markdown(course, filename, markdown, overwrite)
+
+
+@mcp.tool()
+def start_pipeline(
+    course_dir: Annotated[str | None, Field(description="Optional course dir override.")] = None,
+) -> dict:
+    """One-call pipeline start: file listing + ordered steps + step-1 prompt.
+
+    The user just adds PDFs; the agent follows the prompts in order and
+    saves each .md with save_pipeline_file.
+    """
+    course = course_store.resolve_course_dir(course_dir)
+    listing = course_store.discover_pdfs(course)
+    return {
+        "course_dir": course.name or ".",
+        "lectures": listing["lectures"],
+        "past_exams": listing["past_exams"],
+        "unreadable": listing["unreadable"],
+        "pipeline": workflow_prompts.describe_pipeline(),
+        "first": {
+            "name": "extract_text",
+            "text": workflow_prompts.get_prompt_text("extract_text"),
+        },
+    }
 
 
 @mcp.tool()

@@ -15,7 +15,10 @@ Bilingual site + docs: [`landing/`](landing/) (English / Egyptian Arabic).
 2. In your AI agent, paste it and say: `download and run this mcp`
 3. Restart your agent so the sentra tools appear.
 4. Drop lecture PDFs into `lectures/` and past exams into `past_exams/`.
-5. Say: `make me 2 exams using the sentra mcp` — collect both exams and both answer keys from `output/`.
+5. Say: `run the sentra pipeline` — the agent follows the prompts in order
+   (`extract_text → knowledge_base → professor_dna → exam_targets → predicted_exam`)
+   and saves each `.md` under `output/`. No forms, no schema — the prompts
+   define the structure. Or say: `make me 2 exams using the sentra mcp`.
 
 Not on OpenCode? `uvx sentra-mcp init --agent <claude|cursor|vscode|gemini>`
 writes the right config for your agent. Every agent uses the same local
@@ -50,14 +53,27 @@ You get `output/<name>_exam.md` + `output/<name>_answers.md`, saved locally.
 PDF only in this version. Scanned/image PDFs are flagged instead of
 silently returning nothing — OCR is out of scope, use a text-based export.
 
-## Tools (5, all local)
+## Tools (9) + Prompts (5, the core, all local)
 
-| Tool | What it does |
+Prompts-first: run these in order. Tools only supply evidence.
+`start_pipeline` does steps 1+2 in one call (file list + first prompt).
+
+| Name | What it does |
 |---|---|
+| `extract_text` (prompt) | Step 1: how to read every PDF faithfully. |
+| `knowledge_base` (prompt) | Step 2: writes `output/knowledge_base.md` from lectures. |
+| `professor_dna` (prompt) | Step 3: writes `output/professor_dna.md` from past exams. |
+| `exam_targets` (prompt) | Step 4: writes `output/exam_targets.md` from the two above. |
+| `predicted_exam` (prompt) | Step 5: writes `output/predicted_exam.md` from the three above. |
+| `prompt://{name}` (resource) | Raw prompt text (`text/markdown`). |
+| `start_pipeline` | File listing + ordered steps + step-1 prompt in one call. |
+| `list_workflow_prompts` | Ordered prompt list with output files. |
+| `get_workflow_prompt` | One prompt verbatim + `writes`/`next` (+ OCR note for step 1). |
+| `save_pipeline_file` | Saves `knowledge_base.md` etc. Schemaless — prompt defines structure; only safety checks (known name, non-empty, 1MB cap, no silent overwrite). |
 | `list_course_pdfs` | Lists your PDFs, reports unreadable files. Never leaves the course folder. |
-| `extract_pdf_text` | Page-preserving text extraction (50 pages / 60k chars per call). No OCR. |
-| `analyze_past_exams` | Question types, patterns, approx difficulty — every finding cites `file:page`. Finds patterns only; never predicts the real exam. |
-| `prepare_exam_brief` | Validates your exam spec (difficulty must total 100). The agent writes the questions. |
+| `extract_pdf_text` | Page-preserving text extraction (50 pages / 60k chars per call). No OCR — scanned PDFs return `insufficient_text` instead of invented text. |
+| `analyze_past_exams` | Evidence for the `professor_dna` prompt (counts + `file:page` cites). |
+| `prepare_exam_brief` | Evidence for mock-exam writing (spec + excerpts + style card). |
 | `save_exam_files` | Saves exam + separate answer key. Refuses silent overwrites. |
 
 Question types allowed: MCQ, True/False, Short Answer, Essay, Numerical,
@@ -87,7 +103,7 @@ Comparison, Diagram, Case Study, Application, Analysis, Problem Solving.
 git clone https://github.com/mo22zy2/Sentra-MCP.git
 cd Sentra-MCP
 uv sync   # needs Python 3.11+ and uv
-uv run pytest -q   # expect: 42 passed
+uv run pytest -q   # expect: 49 passed
 ```
 
 Manual config example: [`opencode.jsonc.example`](opencode.jsonc.example)
@@ -108,7 +124,10 @@ files. Nothing leaves this machine — NEVER upload their files anywhere.
    from `opencode.jsonc.example` under `mcp` in the agent config.
 3. Course folder = the opened folder: `lectures/`, `past_exams/`, `output/`
    (auto-created). Tell the user where to drop PDFs, in their language.
-4. Verify the 5 tools respond, then tell the user to RESTART their agent.
-5. Per exam: `prepare_exam_brief` with its spec, original questions only
+4. Verify the pipeline responds (`list_workflow_prompts` + 5 prompts), then tell the user to RESTART their agent.
+5. Prompts-first: `start_pipeline`, then run prompts in order
+   (`extract_text → knowledge_base → professor_dna → exam_targets → predicted_exam`),
+   saving each with `save_pipeline_file` (schemaless — prompt defines structure).
+   Per mock exam: `prepare_exam_brief` with its spec, original questions only
    (never copy past exams), `save_exam_files` with a DIFFERENT basename per
    exam. Answer keys stay in separate `*_answers.md` files.

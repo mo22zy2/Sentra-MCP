@@ -212,6 +212,6 @@ def run_init(
     if info["backup_path"]:
         print(f"   Your previous config was backed up to: {info['backup_path']}")
     print(f"3. {spec['hint']}")
-    print("4. Then ask: 'Make me 2 exams using the sentra mcp.'")
-    print("   Each exam is saved separately under output/ with its own answer key.")
+    print("4. Then ask: 'Run the sentra pipeline.' (prompts-first: knowledge_base → professor_dna → exam_targets → predicted_exam, saved under output/)")
+    print("   Or ask for mock exams: 'Make me 2 exams using the sentra mcp.'")
     return 0

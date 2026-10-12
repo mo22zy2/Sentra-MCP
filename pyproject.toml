@@ -1,6 +1,6 @@
 [project]
 name = "sentra-mcp"
-version = "1.0.0"
+version = "1.1.0"
 description = "Sentra — local-first MCP server for mock exam generation"
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
