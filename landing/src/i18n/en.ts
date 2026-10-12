@@ -93,7 +93,7 @@ export const en = {
     prompt:
       "Analyze these Operating Systems lectures and past exams, then generate a two-hour mock exam with an answer key.",
     steps: ["Inspecting files…", "Analyzing available exams…", "Generating questions…", "Producing the mock exam…"],
-    done: "output/os_mock_exam.md + os_mock_answers.md saved locally",
+    done: "output/knowledge_base.md + professor_dna.md + exam_targets.md + predicted_exam.md saved locally",
     replay: "Replay",
   },
   quickstart: {

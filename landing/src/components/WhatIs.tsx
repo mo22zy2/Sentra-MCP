@@ -42,7 +42,7 @@ export function WhatIs() {
       <div className="mt-6 flex items-center gap-2 text-sm text-muted">
         <BookOpenText className="h-4 w-4 text-navy" aria-hidden="true" />
         <span dir="ltr" className="code-ltr font-mono text-[13px]">
-          lectures/*.pdf → analyze → output/*_exam.md + *_answers.md
+          lectures/*.pdf → pipeline → output/knowledge_base.md + professor_dna.md + exam_targets.md + predicted_exam.md
         </span>
       </div>
     </Section>

@@ -16,7 +16,7 @@ export const ar: Dict = {
     close: "اقفل",
   },
   hero: {
-    badge: "أكِّل Sentra امتحاناتك",
+    badge: "sentra يتغذى على امتحاناتك",
     headlineA: "امتحاناتك القديمة،",
     headlineB: "استعداد أقوى للي جاي.",
     description:
@@ -95,7 +95,7 @@ export const ar: Dict = {
     prompt:
       "حلّل محاضرات الـ Operating Systems والامتحانات القديمة، واعملّي امتحان تجريبي مدته ساعتين ومعاه نموذج إجابة.",
     steps: ["بيفحص الملفات…", "بيحلّل الامتحانات المتاحة…", "بيكتب الأسئلة…", "بيجهّز الامتحان التجريبي…"],
-    done: "output/os_mock_exam.md + os_mock_answers.md اتحفظوا على جهازك",
+    done: "output/knowledge_base.md + professor_dna.md + exam_targets.md + predicted_exam.md اتحفظوا على جهازك",
     replay: "عيد العرض",
   },
   quickstart: {
