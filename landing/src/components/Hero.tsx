@@ -90,14 +90,14 @@ export function Hero() {
           >
             {t.hero.headlineA}
             <br />
-            <span className="relative inline-block text-navy">
+            <span className="relative inline-block pb-8 text-navy">
               {t.hero.headlineB}
-              <svg viewBox="0 0 300 16" className="absolute -bottom-6 start-0 w-full overflow-visible" aria-hidden="true" preserveAspectRatio="none">
+              <svg viewBox="0 0 300 16" className="absolute bottom-0 start-0 w-full overflow-visible" aria-hidden="true" preserveAspectRatio="none">
                 <path d="M4 9 C 80 3, 220 3, 296 8" fill="none" stroke="#FFD43B" strokeWidth="4.5" strokeLinecap="round" />
               </svg>
             </span>
           </motion.h1>
-          <motion.p variants={staggerChild} className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+          <motion.p variants={staggerChild} className="mt-4 max-w-xl text-lg leading-relaxed text-muted">
             {t.hero.description}
           </motion.p>
           <motion.div variants={staggerChild} className="mt-8 flex flex-wrap items-center gap-4">
