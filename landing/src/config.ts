@@ -10,6 +10,18 @@ export const GITHUB_URL: string = "https://github.com/mo22zy2/Sentra-MCP";
 /** The exact sentence the student pastes into OpenCode next to the link. */
 export const AGENT_SENTENCE = "download and run this mcp";
 
+/** Every supported AI agent: official download + docs (both verified) and
+ *  the one-line setup. `setup` mirrors `sentra-mcp init --agent <id>`. */
+export const AGENT_CARDS = [
+  { id: "opencode", name: "OpenCode", download: "https://opencode.ai", docs: "https://opencode.ai/docs/mcp-servers/", setup: "uvx sentra-mcp init" },
+  { id: "claude", name: "Claude Code", download: "https://claude.com/claude-code", docs: "https://docs.anthropic.com/en/docs/claude-code/mcp", setup: "claude mcp add --transport stdio sentra -- uvx sentra-mcp" },
+  { id: "cursor", name: "Cursor", download: "https://cursor.com/download", docs: "https://cursor.com/docs/mcp", setup: "uvx sentra-mcp init --agent cursor" },
+  { id: "vscode", name: "VS Code", download: "https://code.visualstudio.com/download", docs: "https://code.visualstudio.com/docs/agent-customization/mcp-servers", setup: "uvx sentra-mcp init --agent vscode" },
+  { id: "gemini", name: "Gemini CLI", download: "https://geminicli.com", docs: "https://geminicli.com/docs/tools/mcp-server/", setup: "uvx sentra-mcp init --agent gemini" },
+  { id: "windsurf", name: "Windsurf", download: "https://windsurf.com", docs: "https://docs.windsurf.com/windsurf/cascade", setup: "uvx sentra-mcp init --agent windsurf" },
+  { id: "cline", name: "Cline", download: "https://cline.bot", docs: "https://docs.cline.bot/mcp/mcp-overview", setup: "uvx sentra-mcp init --agent cline" },
+] as const;
+
 export const OPENCODE_DOCS_URL = "https://opencode.ai/docs/mcp-servers/";
 export const MCP_SDK_URL = "https://github.com/modelcontextprotocol/python-sdk";
 

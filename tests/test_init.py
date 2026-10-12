@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from sentra import init_cmd
+from sentra import agents, init_cmd
 
 
 def test_init_merges_without_deleting_keys(tmp_path: Path, monkeypatch):
@@ -72,3 +72,35 @@ def test_init_rejects_non_object_mcp(tmp_path: Path):
     cfg = tmp_path / "opencode.json"
     cfg.write_text(json.dumps({"mcp": ["nope"]}), encoding="utf-8")
     assert init_cmd.run_init(course_dir=str(tmp_path / "C"), config=str(cfg)) == 1
+
+
+@pytest.mark.parametrize("agent_id", list(agents.AGENT_IDS))
+def test_init_every_agent_shape(tmp_path: Path, monkeypatch, agent_id: str):
+    """Every supported agent gets a correct, minimal entry; existing keys survive."""
+    monkeypatch.chdir(tmp_path)
+    course = tmp_path / "Course"
+    if agents.AGENTS[agent_id]["kind"] == "project":
+        target = course / agents.AGENTS[agent_id]["filename"]
+    else:
+        target = tmp_path / f"{agent_id}-config.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps({"existing": {"keep": True}}), encoding="utf-8")
+    rc = init_cmd.run_init(course_dir=str(course), config=str(target), agent=agent_id)
+    assert rc == 0
+    data = json.loads(target.read_text(encoding="utf-8"))
+    assert data["existing"] == {"keep": True}
+    root = {"opencode": "mcp", "vscode": "servers"}.get(agent_id, "mcpServers")
+    entry = data[root]["sentra"]
+    if agent_id == "opencode":
+        assert entry["command"] == ["uvx", "sentra-mcp"]
+    else:
+        assert entry["command"] == "uvx"
+        assert entry["args"] == ["sentra-mcp"]
+    # second run backs up, never duplicates/corrupts
+    assert init_cmd.run_init(course_dir=str(course), config=str(target), agent=agent_id) == 0
+    assert len(list(target.parent.glob(f"{target.name}.bak-*"))) == 1
+
+
+def test_init_rejects_unknown_agent(tmp_path: Path, capsys):
+    assert init_cmd.run_init(config=str(tmp_path / "c.json"), agent="notepad") == 1
+    assert "Unknown agent" in capsys.readouterr().err

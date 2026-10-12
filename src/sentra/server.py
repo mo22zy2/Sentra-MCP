@@ -7,7 +7,7 @@ from typing import Annotated
 from mcp.server import MCPServer
 from pydantic import Field
 
-from . import analysis_prep, course_store, exam_files, exam_spec, init_cmd, pdf_reader, settings
+from . import agents, analysis_prep, course_store, exam_files, exam_spec, init_cmd, pdf_reader, settings
 
 mcp = MCPServer("sentra")
 
@@ -130,11 +130,17 @@ def main() -> None:
         help="'serve' starts the MCP server (default); 'init' sets up course folders + OpenCode config.",
     )
     parser.add_argument("--course-dir", default=None, help="Course folder for 'init' (default: current folder; only this writes SENTRA_COURSE_DIR).")
-    parser.add_argument("--config", default=None, help="OpenCode config file for 'init' (default: auto-detect).")
+    parser.add_argument("--config", default=None, help="Agent config file for 'init' (default: auto-detect).")
+    parser.add_argument(
+        "--agent",
+        default="opencode",
+        choices=list(agents.AGENT_IDS),
+        help="Which AI agent to configure (default: opencode).",
+    )
     args = parser.parse_args()
 
     if args.command == "init":
-        sys.exit(init_cmd.run_init(course_dir=args.course_dir, config=args.config))
+        sys.exit(init_cmd.run_init(course_dir=args.course_dir, config=args.config, agent=args.agent))
     mcp.run()
 
 

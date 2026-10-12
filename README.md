@@ -47,7 +47,9 @@ machine — NEVER upload their files anywhere.
 
 1. Copy this repo link: \https://github.com/mo22zy2/Sentra-MCP2. In OpenCode, paste it and say: \download and run this mcp3. Restart OpenCode so the sentra tools appear.
 4. Drop lecture PDFs into \lectures/\ and past exams into \past_exams/\.
-5. Say: \make me 2 exams using the sentra mcp\ — collect both exams and both answer keys from \output/\.
+5. Say: `make me 2 exams using the sentra mcp` - collect both exams and both answer keys from `output/`.
+
+Not on OpenCode? Same flow, your agent's config: `uvx sentra-mcp init --agent <claude|cursor|vscode|gemini|windsurf|cline>` writes the right file and format for each (Claude Code also accepts `claude mcp add --transport stdio sentra -- uvx sentra-mcp`). Every agent reads the same local `lectures/`, `past_exams/`, `output/` folders.
 
 Prefer to run it yourself?
 
