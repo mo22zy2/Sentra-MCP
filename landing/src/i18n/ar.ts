@@ -16,7 +16,7 @@ export const ar: Dict = {
     close: "اقفل",
   },
   hero: {
-    badge: "sentra يتغذى على امتحاناتك",
+    badge: "Sentra يتغذى على امتحاناتك",
     headlineA: "امتحاناتك القديمة،",
     headlineB: "استعداد أقوى للي جاي.",
     description:
