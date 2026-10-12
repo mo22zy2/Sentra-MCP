@@ -110,6 +110,10 @@ export const en = {
   install: {
     eyebrow: "Installation guide",
     title: "Up and running in seven steps.",
+    modeFast: "Fast way",
+    modeNerd: "Nerd way",
+    modeHint: "New here? Go fast. Comfortable with terminals? Go nerd.",
+    goQuick: "Open the 1-minute setup",
     steps: [
       { title: "Prerequisites", body: "You need about 10 minutes and an internet connection. Python is fetched automatically — the only thing you install is uv." },
       { title: "Get Sentra", body: "The quick path needs no download — one command fetches everything. Only clone the repo if you want to develop or run the manual setup." },
@@ -165,6 +169,7 @@ export const en = {
     install: "Installation guide",
     github: "GitHub",
     contribute: "Contribute",
+    contact: "Contact / suggest an idea",
     providerNote: "Requires OpenCode with a compatible AI provider — provider inference may be billed separately.",
   },
 };

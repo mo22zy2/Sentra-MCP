@@ -74,6 +74,9 @@ export function Footer() {
           ) : (
             <span className="text-muted">{t.footer.contribute}</span>
           )}
+          <a href="mailto:moja3222@gmail.com?subject=Sentra%20suggestion" className="text-navy hover:underline">
+            {t.footer.contact}
+          </a>
         </nav>
         <p className="text-sm leading-relaxed text-muted">{t.footer.providerNote}</p>
       </div>

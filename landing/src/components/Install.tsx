@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ArrowRight, CheckCircle2, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ExternalLink, Wrench, Zap } from "lucide-react";
 import { FOLDER_TREE, INSTALL_COMMANDS, MCP_SDK_URL, OPENCODE_CONFIG_JSON, OPENCODE_DOCS_URL } from "../config";
 import { useLang } from "../i18n";
 import { fadeUp } from "../motion/variants";
@@ -10,6 +10,7 @@ import { Section } from "./Section";
 export function Install() {
   const { t, lang } = useLang();
   const [step, setStep] = useState(0);
+  const [mode, setMode] = useState<"fast" | "nerd">("fast");
   const total = t.install.steps.length;
   const rtl = lang === "ar";
 
@@ -19,6 +20,53 @@ export function Install() {
 
   return (
     <Section id="install" eyebrow={t.install.eyebrow} title={t.install.title} muted>
+      {/* fast / nerd chooser */}
+      <div className="mb-3 flex flex-wrap items-center gap-2" role="group" aria-label={t.install.title}>
+        {(["fast", "nerd"] as const).map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            aria-pressed={mode === m}
+            className={`flex items-center gap-2 rounded-xl border-2 px-5 py-2.5 text-[15px] font-bold transition-colors ${
+              mode === m ? "border-navy bg-navy text-white" : "border-line bg-white text-muted hover:border-sky"
+            }`}
+          >
+            {m === "fast" ? <Zap className="h-4 w-4 text-sun" /> : <Wrench className="h-4 w-4" />}
+            {m === "fast" ? t.install.modeFast : t.install.modeNerd}
+          </button>
+        ))}
+        <span className="text-sm text-muted">{t.install.modeHint}</span>
+      </div>
+
+      {mode === "fast" && (
+        <motion.div
+          key={`fast-${lang}`}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="rounded-2xl border-2 border-sun bg-sun-soft/40 p-6 sm:p-8"
+        >
+          <ol className="space-y-2.5">
+            {t.quickstart.journey.map((s, i) => (
+              <li key={s} className="flex items-start gap-3 text-[15.5px] leading-relaxed text-ink">
+                <span className="font-display grid h-7 w-7 shrink-0 place-items-center rounded-full bg-navy text-sm font-bold text-white">
+                  {i + 1}
+                </span>
+                <span className="pt-0.5">{s}</span>
+              </li>
+            ))}
+          </ol>
+          <a
+            href="#quickstart"
+            className="font-display mt-6 inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3 font-bold text-white transition-transform hover:-translate-y-0.5"
+          >
+            <Zap className="h-4 w-4 text-sun" /> {t.install.goQuick}
+          </a>
+        </motion.div>
+      )}
+
+      {mode === "nerd" && (
+      <>
       {/* step indicator */}
       <div className="mb-8 flex flex-wrap items-center gap-2" role="tablist" aria-label={t.install.title}>
         {t.install.steps.map((s, i) => (
@@ -42,7 +90,7 @@ export function Install() {
             >
               {i < step ? "✓" : i + 1}
             </span>
-            <span className="hidden lg:inline">{s.title}</span>
+            <span className="hidden sm:inline">{s.title}</span>
           </button>
         ))}
       </div>
@@ -140,6 +188,7 @@ export function Install() {
           </div>
         </aside>
       </div>
+      </>)}
     </Section>
   );
 }
