@@ -12,11 +12,19 @@ class CourseAccessError(ValueError):
 
 
 def resolve_course_dir(explicit: str | None = None) -> Path:
+    """Resolve the course dir, auto-creating it and its subfolders.
+
+    The user never assigns paths: the opened folder is the course folder.
+    Guardrails (traversal blocking, size caps) are unchanged.
+    """
     course = settings.get_course_dir(explicit)
-    if not course.is_dir():
+    try:
+        course.mkdir(parents=True, exist_ok=True)
+        for sub in (settings.LECTURES_SUBDIR, settings.PAST_EXAMS_SUBDIR, settings.OUTPUT_SUBDIR):
+            (course / sub).mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
         raise CourseAccessError(
-            f"Course directory does not exist: {course}. "
-            "Create it or set SENTRA_COURSE_DIR to an existing folder."
+            f"Cannot use course directory {course}: {exc}."
         )
     return course
 

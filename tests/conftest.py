@@ -20,7 +20,7 @@ def _make_pdf(path: Path, pages_text: list[str]) -> None:
 
 @pytest.fixture()
 def course_dir(tmp_path: Path, monkeypatch) -> Path:
-    course = tmp_path / "OS-Course"
+    course = tmp_path / "Course"
     (course / "lectures").mkdir(parents=True)
     (course / "past_exams").mkdir(parents=True)
     (course / "output").mkdir(parents=True)

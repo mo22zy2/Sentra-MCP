@@ -21,7 +21,7 @@ export function Faq() {
           const isOpen = open === i;
           return (
             <div
-              key={item.q}
+              key={i}
               className={`overflow-hidden rounded-2xl border bg-white transition-colors ${
                 isOpen ? "border-navy" : "border-line"
               }`}

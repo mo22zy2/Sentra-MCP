@@ -24,7 +24,7 @@ def test_init_merges_without_deleting_keys(tmp_path: Path, monkeypatch):
     # pre-existing keys untouched
     assert data["mcp"]["other"] == {"type": "local", "command": ["x"]}
     assert data["tools"] == {"other_*": False}
-    # sentra block added
+    # sentra block added; explicit course dir is recorded, nothing hardcoded by default
     block = data["mcp"]["sentra"]
     assert block["command"] == ["uvx", "sentra-mcp"]
     assert block["environment"]["SENTRA_COURSE_DIR"] == str(course.resolve())
@@ -38,12 +38,24 @@ def test_init_merges_without_deleting_keys(tmp_path: Path, monkeypatch):
     assert (course / "output").is_dir()
 
 
-def test_init_creates_missing_config(tmp_path: Path):
-    cfg = tmp_path / "sub" / "opencode.json"
-    course = tmp_path / "Course"
+def test_init_explicit_course_dir_writes_env(tmp_path: Path):
+    cfg = tmp_path / "opencode.json"
+    course = tmp_path / "MyPhysics"
     assert init_cmd.run_init(course_dir=str(course), config=str(cfg)) == 0
     data = json.loads(cfg.read_text(encoding="utf-8"))
-    assert data["mcp"]["sentra"]["type"] == "local"
+    assert data["mcp"]["sentra"]["environment"]["SENTRA_COURSE_DIR"] == str(course.resolve())
+    assert (course / "lectures").is_dir()
+
+
+def test_init_default_uses_cwd_without_env(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    cfg = tmp_path / "opencode.json"
+    assert init_cmd.run_init(config=str(cfg)) == 0
+    data = json.loads(cfg.read_text(encoding="utf-8"))
+    assert "environment" not in data["mcp"]["sentra"]
+    assert (tmp_path / "lectures").is_dir()
+    assert (tmp_path / "past_exams").is_dir()
+    assert (tmp_path / "output").is_dir()
 
 
 def test_init_rejects_malformed_json(tmp_path: Path, capsys):

@@ -16,9 +16,18 @@ export function DemoChat() {
     setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
 
+  // Restart the sequence on language change. If the demo is already on
+  // screen, start immediately; otherwise the live observer below fires
+  // when it scrolls into view. No page reload ever needed.
   useEffect(() => {
     setVisible(0);
-    setStarted(false);
+    const el = ref.current;
+    if (!el) {
+      setStarted(false);
+      return;
+    }
+    const r = el.getBoundingClientRect();
+    setStarted(r.top < window.innerHeight && r.bottom > 0);
   }, [lang]);
 
   useEffect(() => {
@@ -32,6 +41,8 @@ export function DemoChat() {
     return () => clearTimeout(id);
   }, [started, visible, reduced, t.demo.steps.length]);
 
+  // One permanent observer for the component lifetime: it fires whenever
+  // the demo scrolls into view (first visit AND after language toggles).
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -39,7 +50,6 @@ export function DemoChat() {
       (entries) => {
         if (entries[0].isIntersecting) {
           setStarted(true);
-          obs.disconnect();
         }
       },
       { threshold: 0.3 }
@@ -90,7 +100,7 @@ export function DemoChat() {
             const last = i === visible - 1 && visible <= t.demo.steps.length;
             return (
               <motion.div
-                key={`${lang}-${i}`}
+                key={i}
                 initial={reduced ? false : { opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="flex items-center gap-3 ps-11 text-[15px] text-muted"

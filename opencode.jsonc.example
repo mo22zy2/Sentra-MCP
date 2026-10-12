@@ -1,12 +1,10 @@
 {
+  // Open OpenCode in your course folder — no paths needed.
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
     "sentra": {
       "type": "local",
       "command": ["uvx", "sentra-mcp"],
-      "environment": {
-        "SENTRA_COURSE_DIR": "<ABSOLUTE_PATH_TO_COURSE_FOLDER>"
-      },
       "enabled": true,
       "timeout": 30000
     }

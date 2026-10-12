@@ -23,7 +23,7 @@ export function HowItWorks() {
         {t.how.steps.map((step, i) => {
           const Icon = ICONS[i % ICONS.length];
           return (
-            <motion.li key={step.title} variants={staggerChild} className="relative">
+            <motion.li key={i} variants={staggerChild} className="relative">
               <div className="relative z-10 inline-grid h-14 w-14 place-items-center rounded-2xl border-2 border-navy bg-white shadow-[0_3px_0_#FFD43B]">
                 <Icon className="h-6 w-6 text-navy" aria-hidden="true" />
                 <span className="font-display absolute -top-2.5 -end-2.5 grid h-7 w-7 place-items-center rounded-full bg-navy text-sm font-bold text-white">

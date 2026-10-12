@@ -18,10 +18,23 @@ def test_discover_lists_lectures_and_exams(course_dir):
     assert "lectures/empty.pdf" in reasons
 
 
-def test_missing_course_dir_raises(tmp_path, monkeypatch):
-    monkeypatch.setenv("SENTRA_COURSE_DIR", str(tmp_path / "nope"))
-    with pytest.raises(course_store.CourseAccessError):
-        course_store.resolve_course_dir()
+def test_missing_course_dir_is_created(tmp_path, monkeypatch):
+    target = tmp_path / "NewCourse"
+    monkeypatch.setenv("SENTRA_COURSE_DIR", str(target))
+    course = course_store.resolve_course_dir()
+    assert course == target.resolve()
+    assert (course / "lectures").is_dir()
+    assert (course / "past_exams").is_dir()
+    assert (course / "output").is_dir()
+
+
+def test_default_is_cwd_and_auto_created(tmp_path, monkeypatch):
+    monkeypatch.delenv("SENTRA_COURSE_DIR", raising=False)
+    monkeypatch.chdir(tmp_path)
+    course = course_store.resolve_course_dir()
+    assert course == tmp_path.resolve()
+    assert (course / "lectures").is_dir()
+    assert (course / "output").is_dir()
 
 
 def test_traversal_blocked(course_dir):

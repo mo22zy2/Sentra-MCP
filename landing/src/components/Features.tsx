@@ -22,7 +22,7 @@ export function Features() {
           const highlight = i === 2;
           return (
             <motion.article
-              key={card.title}
+              key={i}
               variants={staggerChild}
               whileHover={{ y: -6 }}
               transition={{ type: "spring", stiffness: 300, damping: 22 }}
@@ -39,8 +39,8 @@ export function Features() {
               </div>
               <h3 className="font-display mt-4 text-lg font-bold text-ink">{card.title}</h3>
               <ul className="mt-3 space-y-2 text-[15px] leading-relaxed text-muted">
-                {card.points.map((p) => (
-                  <li key={p} className="flex gap-2">
+                {card.points.map((p, j) => (
+                  <li key={j} className="flex gap-2">
                     <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-sky" aria-hidden="true" />
                     {p}
                   </li>

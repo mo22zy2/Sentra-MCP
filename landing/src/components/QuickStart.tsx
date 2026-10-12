@@ -23,7 +23,7 @@ export function QuickStart() {
         >
           {t.quickstart.journey.map((step, i) => (
             <motion.li
-              key={step}
+              key={i}
               variants={staggerChild}
               className="flex items-start gap-3 rounded-2xl border border-line bg-white p-4"
             >

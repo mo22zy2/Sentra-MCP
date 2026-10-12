@@ -29,9 +29,10 @@ machine — NEVER upload their files anywhere.
    `mcp` in the user's `opencode.json` (create `mcp` if missing, keep every
    other key). Prefer command `["uvx", "sentra-mcp"]`; from source use
    `["uv", "--directory", "<ABSOLUTE_REPO_PATH>", "run", "sentra"]`.
-   Set `SENTRA_COURSE_DIR` to an absolute course path.
-3. Course folder: create `OS-Course/{lectures,past_exams,output}` if `init`
-   didn't (default: next to the repo or under Documents).
+   No paths needed: the folder already opened is the course folder.
+3. Course folder: make sure `lectures/`, `past_exams/` and `output/` exist
+   where the user works (the server auto-creates them). Tell the user to
+   drop PDFs into `lectures/` and past exams into `past_exams/`.
 4. Verify the 5 tools respond: list_course_pdfs, extract_pdf_text,
    analyze_past_exams, prepare_exam_brief, save_exam_files.
 5. Tell the user (simply, in their language): the exact folder to drop PDFs
@@ -103,9 +104,8 @@ uv run pytest -q               # expect: 30 passed
 
 1. Install OpenCode per https://opencode.ai/docs and configure any
    compatible provider/model. That provider bills you if paid.
-2. Copy `opencode.jsonc.example` into your OpenCode config (`opencode.json`),
-   replacing `<ABSOLUTE_PATH_TO_SENTRA_REPO>` and
-   `<ABSOLUTE_PATH_TO_COURSE_FOLDER>` with real absolute paths:
+2. Copy `opencode.jsonc.example` into your OpenCode config (`opencode.json`).
+   No paths needed when you open OpenCode in the course folder:
 
 ```jsonc
 {
@@ -114,7 +114,6 @@ uv run pytest -q               # expect: 30 passed
     "sentra": {
       "type": "local",
       "command": ["uvx", "sentra-mcp"],
-      "environment": { "SENTRA_COURSE_DIR": "<ABSOLUTE_PATH_TO_COURSE_FOLDER>" },
       "enabled": true,
       "timeout": 30000
     }
@@ -128,15 +127,15 @@ Developers running from source can use
 instead.)
 
 Verified against https://opencode.ai/docs/mcp-servers: `type: "local"`
-+ `command[]` array, absolute `--directory`, `environment` for the course dir
-(not secrets), `enabled`, `timeout`. Never put API keys here.
++ `command[]` array, `enabled`, `timeout`. No `environment` needed by default
+(the opened folder is the course folder). Never put API keys here.
 
 ### Course folder
 
 ```
-OS-Course/
-├── lectures/     # lecture PDFs (primary content source)
-├── past_exams/   # previous exam PDFs (style evidence)
+<the folder you opened in OpenCode>/
+├── lectures/     # lecture PDFs, primary source (auto-created)
+├── past_exams/   # previous exam PDFs, style evidence (auto-created)
 └── output/       # generated *_exam.md + *_answers.md (auto-created)
 ```
 
@@ -175,9 +174,9 @@ professor DNA → targets → predicted exam).
 
 | Symptom | Fix |
 |---|---|
-| `Course directory does not exist` | Create it or set `SENTRA_COURSE_DIR` to an existing absolute folder. |
+| `No PDFs listed` | Put files in `lectures/` or `past_exams/` inside the opened folder (auto-created). |
 | `Access denied ... escapes the course directory` | Use `lectures/x.pdf`-style relative paths only. |
-| Tools missing in OpenCode | `opencode mcp list`; check absolute `--directory`; re-run `uv sync`; restart OpenCode; bump `timeout` to 30000. |
+| Tools missing in OpenCode | `opencode mcp list`, then restart OpenCode. If still missing, re-run `uvx sentra-mcp init` in the course folder. |
 | `... must sum to 100` | Difficulty `{easy,medium,hard}` must total exactly 100. |
 | `Refusing to overwrite` | New `basename` or `overwrite: true`. |
 | `Unsupported file type` | This version reads PDFs only. |

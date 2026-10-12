@@ -72,7 +72,7 @@ export function PipelineArt() {
 }
 
 export function Hero() {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   return (
     <section id="top" className="overflow-hidden bg-white pt-16">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 pt-14 pb-16 sm:px-8 lg:grid-cols-2 lg:pt-20">
@@ -115,7 +115,7 @@ export function Hero() {
               {t.hero.secondary}
             </a>
           </motion.div>
-          <motion.p variants={staggerChild} className="mt-5 text-sm text-muted" key={lang}>
+          <motion.p variants={staggerChild} className="mt-5 text-sm text-muted">
             {t.hero.note}
           </motion.p>
         </motion.div>

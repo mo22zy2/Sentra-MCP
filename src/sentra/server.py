@@ -16,7 +16,7 @@ mcp = MCPServer("sentra")
 def list_course_pdfs(
     course_dir: Annotated[
         str | None,
-        Field(description="Optional absolute course dir override. Defaults to SENTRA_COURSE_DIR / ./OS-Course / cwd."),
+        Field(description="Optional absolute course dir override. Defaults to SENTRA_COURSE_DIR, else the opened folder (auto-created)."),
     ] = None,
 ) -> dict:
     """List lecture and past-exam PDFs in the course directory.
@@ -85,29 +85,11 @@ def prepare_exam_brief(
     """
     course = course_store.resolve_course_dir(course_dir)
     parsed = exam_spec.ExamSpec.model_validate(spec)
-    # Gather lecture excerpts within a char budget (token-limit friendly).
-    listing = course_store.discover_pdfs(course)
-    excerpts: list[dict] = []
-    budget = 12000
-    for entry in listing["lectures"]:
-        if budget <= 0:
-            break
-        target = course_store.resolve_inside(course, entry["path"])
-        try:
-            data = pdf_reader.extract_pages(target, page_start=1, page_end=2)
-        except Exception:
-            continue
-        for page in data["pages"]:
-            text = page["text"].strip()
-            if len(text) < 50:
-                continue
-            chunk = text[:2000]
-            excerpts.append({"file": entry["path"], "page": page["page_no"], "text": chunk})
-            budget -= len(chunk)
-            if budget <= 0:
-                break
+    # Deep-search evidence across ALL lecture pages (topic-first budget),
+    # so key content sitting deep in the lectures is not missed.
+    excerpts, coverage = exam_spec.collect_evidence(course, parsed.topics)
     analysis = analysis_prep.analyze_course(course)
-    return exam_spec.build_brief(parsed, excerpts, analysis)
+    return exam_spec.build_brief(parsed, excerpts, analysis, coverage)
 
 
 @mcp.tool()
@@ -141,7 +123,7 @@ def main() -> None:
         choices=["serve", "init"],
         help="'serve' starts the MCP server (default); 'init' sets up course folders + OpenCode config.",
     )
-    parser.add_argument("--course-dir", default=None, help="Course folder for 'init' (default: ~/Documents/OS-Course).")
+    parser.add_argument("--course-dir", default=None, help="Course folder for 'init' (default: current folder; only this writes SENTRA_COURSE_DIR).")
     parser.add_argument("--config", default=None, help="OpenCode config file for 'init' (default: auto-detect).")
     args = parser.parse_args()
 

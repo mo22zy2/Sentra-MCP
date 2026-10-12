@@ -24,12 +24,6 @@ class InitError(RuntimeError):
     """User-facing setup failure with a plain-words message."""
 
 
-def default_course_dir() -> Path:
-    docs = Path.home() / "Documents"
-    base = docs if docs.is_dir() else Path.home()
-    return base / "OS-Course"
-
-
 def candidate_config_paths(explicit: str | None = None) -> list[Path]:
     if explicit:
         return [Path(explicit).expanduser()]
@@ -56,17 +50,21 @@ def find_existing_config(explicit: str | None = None) -> Path | None:
     return None
 
 
-def sentra_block(course_dir: Path) -> dict:
-    return {
+def sentra_block(course_dir: Path | None) -> dict:
+    """The opencode.json block. No environment key by default: the server
+    resolves the opened folder automatically, so the user assigns nothing."""
+    block: dict = {
         "type": "local",
         "command": ["uvx", "sentra-mcp"],
-        "environment": {"SENTRA_COURSE_DIR": str(course_dir)},
         "enabled": True,
         "timeout": 30000,
     }
+    if course_dir is not None:
+        block["environment"] = {"SENTRA_COURSE_DIR": str(course_dir)}
+    return block
 
 
-def merge_config_file(config_path: Path, course_dir: Path) -> dict:
+def merge_config_file(config_path: Path, course_dir: Path | None) -> dict:
     """Merge the sentra block into config_path. Returns info about what happened."""
     backup_path: str | None = None
     if config_path.is_file():
@@ -112,11 +110,21 @@ def create_course_tree(course_dir: Path) -> Path:
 
 
 def run_init(course_dir: str | None = None, config: str | None = None) -> int:
-    """Entry point for `sentra-mcp init`. Returns process exit code."""
+    """Entry point for `sentra-mcp init`. Returns process exit code.
+
+    Default (no args): the current folder becomes the course folder —
+    lectures/, past_exams/ and output/ are created in it and no paths are
+    written anywhere. Only --course-dir writes SENTRA_COURSE_DIR.
+    """
     try:
-        course = Path(course_dir).expanduser().resolve() if course_dir else default_course_dir().resolve()
+        if course_dir:
+            course = Path(course_dir).expanduser().resolve()
+            env_course: Path | None = course
+        else:
+            course = Path.cwd().resolve()
+            env_course = None
         target = find_existing_config(config) or (Path(config).expanduser() if config else default_new_config_path())
-        info = merge_config_file(target, course)
+        info = merge_config_file(target, env_course)
         create_course_tree(course)
     except InitError as exc:
         print(f"Setup stopped: {exc}", file=sys.stderr)

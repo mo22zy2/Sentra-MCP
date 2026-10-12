@@ -40,7 +40,6 @@ export function Install() {
 
       {mode === "fast" && (
         <motion.div
-          key={`fast-${lang}`}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
@@ -48,7 +47,7 @@ export function Install() {
         >
           <ol className="space-y-2.5">
             {t.quickstart.journey.map((s, i) => (
-              <li key={s} className="flex items-start gap-3 text-[15.5px] leading-relaxed text-ink">
+              <li key={i} className="flex items-start gap-3 text-[15.5px] leading-relaxed text-ink">
                 <span className="font-display grid h-7 w-7 shrink-0 place-items-center rounded-full bg-navy text-sm font-bold text-white">
                   {i + 1}
                 </span>
@@ -71,7 +70,7 @@ export function Install() {
       <div className="mb-8 flex flex-wrap items-center gap-2" role="tablist" aria-label={t.install.title}>
         {t.install.steps.map((s, i) => (
           <button
-            key={s.title}
+            key={i}
             role="tab"
             aria-selected={step === i}
             onClick={() => setStep(i)}
@@ -105,7 +104,7 @@ export function Install() {
         >
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${lang}-${step}`}
+              key={step}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -138,8 +137,8 @@ export function Install() {
                 )}
                 {step === 6 && (
                   <ul className="space-y-3">
-                    {t.install.troubleshooting.map((item) => (
-                      <li key={item.s} className="rounded-xl border border-line p-4">
+                    {t.install.troubleshooting.map((item, i) => (
+                      <li key={i} className="rounded-xl border border-line p-4">
                         <code dir="ltr" className="code-ltr font-mono text-[13px] font-semibold text-navy">
                           {item.s}
                         </code>
@@ -198,7 +197,7 @@ function Checklist({ items }: { items: string[] }) {
   return (
     <ul className="mt-4 space-y-2.5">
       {items.map((item, i) => (
-        <li key={item}>
+        <li key={i}>
           <button
             onClick={() => setDone((d) => d.map((v, j) => (j === i ? !v : v)))}
             aria-pressed={done[i]}

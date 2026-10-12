@@ -9,15 +9,14 @@ from pathlib import Path
 def get_course_dir(explicit: str | None = None) -> Path:
     """Resolve the permitted course directory.
 
-    Priority: explicit arg > SENTRA_COURSE_DIR env > ./OS-Course > cwd.
-    Always returns an absolute, resolved path. Caller must ensure it exists.
+    Priority: explicit arg > SENTRA_COURSE_DIR env > current working directory.
+    The folder opened in OpenCode IS the course folder: lectures/,
+    past_exams/ and output/ live directly inside it and are auto-created.
+    Always returns an absolute, resolved path.
     """
     raw = explicit or os.getenv("SENTRA_COURSE_DIR")
     if raw:
         return Path(raw).expanduser().resolve()
-    default = Path.cwd() / "OS-Course"
-    if default.is_dir():
-        return default.resolve()
     return Path.cwd().resolve()
 
 

@@ -25,17 +25,15 @@ export const OPENCODE_CONFIG_JSON = `{
     "sentra": {
       "type": "local",
       "command": ["uvx", "sentra-mcp"],
-      "environment": { "SENTRA_COURSE_DIR": "<ABSOLUTE_PATH_TO_COURSE_FOLDER>" },
       "enabled": true,
       "timeout": 30000
     }
   }
 }`;
 
-export const FOLDER_TREE = `Operating-Systems/
+export const FOLDER_TREE = `Course-Folder/   (the folder opened in OpenCode)
 ├── lectures/
-│   ├── lecture_01.pdf
-│   └── lecture_02.pdf
+│   └── lecture_01.pdf
 ├── past_exams/
 │   └── exam_2025.pdf
 └── output/`;
