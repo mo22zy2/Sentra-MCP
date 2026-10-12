@@ -3,8 +3,10 @@ import type { Dict } from "./en";
 export const ar: Dict = {
   meta: { name: "العربية", short: "عربي" },
   nav: {
+    what: "إيه هو؟",
     features: "شوف بيعمل إيه",
     how: "بيشتغل إزاي؟",
+    demo: "مثال",
     quick: "ابدأ بسرعة",
     install: "طريقة التحميل والتشغيل",
     faq: "أسئلة شائعة",

@@ -66,15 +66,14 @@ export function Install() {
 
       {mode === "nerd" && (
       <>
-      {/* step indicator */}
-      <div className="mb-8 flex flex-wrap items-center gap-2" role="tablist" aria-label={t.install.title}>
+      {/* step indicator — listbox style with aria-current, keyboard native */}
+      <ol className="mb-8 flex flex-wrap items-center gap-2" aria-label={t.install.title}>
         {t.install.steps.map((s, i) => (
+          <li key={i}>
           <button
-            key={i}
-            role="tab"
-            aria-selected={step === i}
             onClick={() => setStep(i)}
-            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
+            aria-current={step === i ? "step" : undefined}
+            className={`flex min-h-[44px] items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
               step === i
                 ? "border-navy bg-navy text-white"
                 : i < step
@@ -91,8 +90,9 @@ export function Install() {
             </span>
             <span className="hidden sm:inline">{s.title}</span>
           </button>
+          </li>
         ))}
-      </div>
+      </ol>
 
       <div className="grid gap-6 lg:grid-cols-5">
         <motion.div
@@ -111,7 +111,7 @@ export function Install() {
               transition={{ duration: 0.25 }}
               className="rounded-2xl border border-line bg-white p-6 sm:p-8"
             >
-              <p className="text-sm font-semibold text-sky">
+              <p className="text-sm font-semibold text-navy">
                 {t.install.nav.stepOf} {step + 1} / {total}
               </p>
               <h3 className="font-display mt-2 text-2xl font-bold text-navy">{t.install.steps[step].title}</h3>
@@ -129,7 +129,7 @@ export function Install() {
                 {step === 4 && <CodeBlock label="folder structure" code={FOLDER_TREE} />}
                 {step === 5 && (
                   <>
-                    <div className="rounded-xl border border-line bg-mist/70 p-4 text-[15px] text-ink">
+                    <div dir="ltr" className="code-ltr rounded-xl border border-line bg-mist/70 p-4 text-left text-[15px] text-ink">
                       {t.install.firstRunPrompt}
                       <InlineCopy text={t.install.firstRunPrompt} />
                     </div>
@@ -153,14 +153,14 @@ export function Install() {
                 <button
                   onClick={() => go(-1)}
                   disabled={step === 0}
-                  className="flex items-center gap-1.5 rounded-xl border border-line px-4 py-2.5 text-sm font-semibold text-navy disabled:opacity-40"
+                  className="flex min-h-[44px] items-center gap-1.5 rounded-xl border border-line px-5 py-3 text-sm font-semibold text-navy disabled:opacity-40"
                 >
                   <Prev className="h-4 w-4" /> {t.install.nav.prev}
                 </button>
                 <button
                   onClick={() => go(1)}
                   disabled={step === total - 1}
-                  className="flex items-center gap-1.5 rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
+                  className="flex min-h-[44px] items-center gap-1.5 rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-white disabled:opacity-40"
                 >
                   {t.install.nav.next} <Next className="h-4 w-4" />
                 </button>
@@ -194,19 +194,25 @@ export function Install() {
 
 function Checklist({ items }: { items: string[] }) {
   const [done, setDone] = useState<boolean[]>(() => items.map(() => false));
+  // Reset when language changes and item count differs (labels re-render).
+  const [prevLen, setPrevLen] = useState(items.length);
+  if (items.length !== prevLen) {
+    setPrevLen(items.length);
+    setDone(items.map(() => false));
+  }
   return (
     <ul className="mt-4 space-y-2.5">
       {items.map((item, i) => (
         <li key={i}>
           <button
             onClick={() => setDone((d) => d.map((v, j) => (j === i ? !v : v)))}
-            aria-pressed={done[i]}
-            className={`flex w-full items-start gap-2.5 rounded-xl border p-3 text-start text-[14.5px] transition-colors ${
+            aria-pressed={done[i] ?? false}
+            className={`flex min-h-[44px] w-full items-start gap-2.5 rounded-xl border p-3.5 text-start text-[14.5px] transition-colors ${
               done[i] ? "border-sky bg-mist" : "border-line hover:border-sky"
             }`}
           >
             <CheckCircle2 className={`mt-0.5 h-5 w-5 shrink-0 ${done[i] ? "text-navy" : "text-line"}`} aria-hidden="true" />
-            <span className={done[i] ? "text-navy line-through" : "text-ink"}>{item}</span>
+            <span className={done[i] ? "text-navy" : "text-ink"}>{item}</span>
           </button>
         </li>
       ))}

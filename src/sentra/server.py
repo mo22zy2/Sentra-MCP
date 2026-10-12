@@ -26,8 +26,10 @@ def list_course_pdfs(
     """
     course = course_store.resolve_course_dir(course_dir)
     listing = course_store.discover_pdfs(course)
+    # Return only the folder name, not the absolute path, to avoid leaking
+    # local layout (home/username) into LLM context.
     return {
-        "course_dir": str(course),
+        "course_dir": course.name or ".",
         "lectures": listing["lectures"],
         "past_exams": listing["past_exams"],
         "unreadable": listing["unreadable"],
@@ -54,7 +56,11 @@ def extract_pdf_text(
     if not target.is_file():
         raise ValueError(f"File not found inside course dir: '{relative_path}'.")
     result = pdf_reader.extract_pages(target, page_start=page_start, page_end=page_end)
-    result["relative_path"] = relative_path
+    # Echo canonical path inside course dir (not raw user input like "a/../a/x.pdf").
+    try:
+        result["relative_path"] = str(target.resolve().relative_to(course.resolve()))
+    except ValueError:
+        result["relative_path"] = target.name
     return result
 
 

@@ -2,12 +2,12 @@
 
 @theme {
   --color-ink: #172033;
-  --color-muted: #667085;
+  --color-muted: #4f5869;
   --color-navy: #173b72;
   --color-navy-deep: #102a52;
   --color-sun: #ffd43b;
   --color-sun-soft: #fff4c2;
-  --color-sky: #5ba7e8;
+  --color-sky: #2b6cb0;
   --color-mist: #eaf3ff;
   --color-line: #e5eaf1;
 
@@ -65,7 +65,7 @@ section[id] {
 /* visible keyboard focus */
 a:focus-visible,
 button:focus-visible {
-  outline: 3px solid var(--color-sky);
+  outline: 3px solid var(--color-navy);
   outline-offset: 2px;
   border-radius: 6px;
 }

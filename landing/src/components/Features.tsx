@@ -24,14 +24,13 @@ export function Features() {
             <motion.article
               key={i}
               variants={staggerChild}
-              whileHover={{ y: -6 }}
               transition={{ type: "spring", stiffness: 300, damping: 22 }}
-              className={`group rounded-2xl border bg-white p-6 transition-colors ${
+              className={`rounded-2xl border bg-white p-6 transition-colors ${
                 highlight ? "border-navy shadow-[0_8px_30px_-12px_rgba(23,59,114,0.35)]" : "border-line hover:border-sky"
               }`}
             >
               <div
-                className={`inline-grid h-11 w-11 place-items-center rounded-xl transition-transform group-hover:scale-110 ${
+                className={`inline-grid h-11 w-11 place-items-center rounded-xl ${
                   highlight ? "bg-sun" : "bg-mist"
                 }`}
               >
@@ -41,7 +40,7 @@ export function Features() {
               <ul className="mt-3 space-y-2 text-[15px] leading-relaxed text-muted">
                 {card.points.map((p, j) => (
                   <li key={j} className="flex gap-2">
-                    <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-sky" aria-hidden="true" />
+                    <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-navy" aria-hidden="true" />
                     {p}
                   </li>
                 ))}

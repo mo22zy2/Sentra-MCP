@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Literal
 
@@ -38,13 +39,26 @@ class ExamSpec(BaseModel):
     total_marks: int | None = Field(default=None, gt=0, le=1000)
     language: str = Field(default="English", min_length=1, max_length=50)
 
+    @field_validator("course_name", "language")
+    @classmethod
+    def _nonblank_names(cls, v: str) -> str:
+        cleaned = v.strip()
+        if not cleaned:
+            raise ValueError("must not be blank.")
+        return cleaned
+
     @field_validator("question_types")
     @classmethod
     def _known_types(cls, v: list[str]) -> list[str]:
         bad = [t for t in v if t not in ALLOWED_TYPES]
         if bad:
             raise ValueError(f"Unknown question types: {bad}. Allowed: {sorted(ALLOWED_TYPES)}")
-        return v
+        # Deduplicate preserving order (MCQ,MCQ -> MCQ).
+        seen: list[str] = []
+        for t in v:
+            if t not in seen:
+                seen.append(t)
+        return seen
 
     @field_validator("topics")
     @classmethod
@@ -55,6 +69,28 @@ class ExamSpec(BaseModel):
                 raise ValueError("topics must not contain blank strings.")
             return cleaned
         return v
+
+
+def _topic_in_text(topic: str, low_chunk: str) -> bool:
+    """Word-boundary match (avoids 'art' in 'part'). Multi-word topics
+    match as whole phrase with boundaries on both ends."""
+    pattern = r"\b" + re.escape(topic.lower()) + r"\b"
+    return re.search(pattern, low_chunk) is not None
+
+
+def _sort_refs(pages: set[str]) -> list[str]:
+    """Numeric sort by page (p2 < p10), then file name."""
+
+    def key(ref: str) -> tuple[str, int, str]:
+        if ":p" in ref:
+            file_part, _, page_part = ref.rpartition(":p")
+            try:
+                return (file_part, int(page_part), ref)
+            except ValueError:
+                pass
+        return (ref, 0, ref)
+
+    return sorted(pages, key=key)
 
 
 def _split_chunks(text: str, chunk_chars: int = 1500) -> list[str]:
@@ -116,7 +152,7 @@ def collect_evidence(
                     if len(chunk.strip()) < 50:
                         continue
                     low = chunk.lower()
-                    hits = [t for t in wanted if t.lower() in low]
+                    hits = [t for t in wanted if _topic_in_text(t, low)]
                     for t in hits:
                         coverage[t].add(f"{entry['path']}:p{page['page_no']}")
                     scored.append((len(hits), order, {
@@ -139,7 +175,7 @@ def collect_evidence(
         used += len(ex["text"])
         if used >= budget:
             break
-    return excerpts, {t: sorted(pages) for t, pages in coverage.items()}
+    return excerpts, {t: _sort_refs(pages) for t, pages in coverage.items()}
 
 
 def style_signature(analysis: dict) -> list[str]:
@@ -232,7 +268,7 @@ def build_brief(
             if found:
                 continue
             corpus = " ".join(e["text"] for e in lecture_excerpts).lower()
-            if t.lower() not in corpus:
+            if not _topic_in_text(t, corpus):
                 warnings.append(
                     f"Requested topic '{t}' not found in the deep search of all lecture pages — "
                     "any question on it must be labeled [Uncertain] or omitted."

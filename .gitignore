@@ -8,8 +8,17 @@ __pycache__/
 .pytest_cache/
 
 # Student materials — never commit private PDFs
+Course/**/*.pdf
+Course/**/*.PDF
 OS-Course/**/*.pdf
 OS-Course/**/*.PDF
+lectures/**/*.pdf
+lectures/**/*.PDF
+past_exams/**/*.pdf
+past_exams/**/*.PDF
+Course/output/*.md
+output/*.md
+opencode.json.bak-*
 
 # Frontend
 landing/node_modules/

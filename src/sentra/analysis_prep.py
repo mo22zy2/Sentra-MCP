@@ -14,8 +14,20 @@ DISCLAIMER = (
 )
 
 # Question splitter: Q1, Q1., Q1), Question 1, 1.
-Q_SPLIT = re.compile(r"(?im)^\s*(?:question\s*)?(?:Q\s*)?(\d{1,3})\s*(?:[.\)\:\-]\s*|\s+)")
-MARKS = re.compile(r"[(\[]\s*(\d{1,3})\s*(?:marks?|pts?|points?)\s*[)\]]|(\d{1,3})\s*marks?", re.IGNORECASE)
+# Bare numbers REQUIRE punctuation ("1. Intro"); Q/Question prefix allows
+# bare space ("Q1 Define..."). Prevents "1 Introduction" / "2024" false splits.
+# Three capture groups (question-num, Q-num, bare-num); exactly one matches.
+Q_SPLIT = re.compile(
+    r"(?im)^\s*(?:question\s+Q?\s*0*(\d{1,3})\s*(?:[.\)\:\-]?\s+)"
+    r"|Q\s*0*(\d{1,3})\s*(?:[.\)\:\-]?\s+)"
+    r"|0*(\d{1,3})\s*[.\)\:\-]\s+)"
+)
+MARKS = re.compile(
+    r"[(\[]\s*(\d{1,3})\s*(?:marks?|pts?|points?)\s*[)\]]"
+    r"|(\d{1,3})\s*marks?"
+    r"|\(\s*(\d{1,3})\s*\)",
+    re.IGNORECASE,
+)
 MCQ_LABELS = re.compile(r"(?m)^\s*(?:[A-Da-d1-4]\s*[\)\.\:\-])\s+\S+")
 
 TEMPLATES = [
@@ -35,6 +47,8 @@ STOPWORDS = {
     "the", "and", "for", "with", "from", "that", "this", "which", "what", "when",
     "define", "explain", "compare", "calculate", "following", "question", "marks",
     "mark", "points", "true", "false", "each", "using", "used", "into", "between",
+    "about", "their", "there", "these", "those", "have", "has", "had", "will",
+    "would", "could", "should", "than", "then", "them", "they", "your", "you",
 }
 
 
@@ -85,19 +99,64 @@ def analyze_course(course_dir: Path, max_pages_per_exam: int = 50) -> dict:
             per_exam_counts.append({"file": rel, "error": str(exc)})
             continue
         # Split into questions using numbering; keep page refs.
+        # Uses finditer slicing (robust to multi-group Q_SPLIT), preserves
+        # preamble as intro chunk, and coalesces cross-page continuations.
         chunks: list[tuple[int, str]] = []  # (page_no, qtext)
-        for page in data["pages"]:
-            parts = Q_SPLIT.split(page["text"])
-            # split() with capture group: [pre, num1, text1, num2, text2, ...]
-            if len(parts) >= 3:
-                for idx in range(1, len(parts), 2):
-                    num = parts[idx]
-                    body = parts[idx + 1] if idx + 1 < len(parts) else ""
-                    chunks.append((page["page_no"], f"Q{num} {body.strip()}"))
-            elif page["text"].strip():
-                chunks.append((page["page_no"], page["text"].strip()[:2000]))
+        pending: tuple[int, str] | None = None  # unterminated Q across pages
 
-        per_exam_counts.append({"file": rel, "questions_found": len(chunks), "pages": data["total_pages"]})
+        def _flush_pending() -> None:
+            nonlocal pending
+            if pending is not None:
+                chunks.append(pending)
+                pending = None
+
+        def _qnum(m: re.Match) -> str:
+            return next(g for g in m.groups() if g is not None)
+
+        for page in data["pages"]:
+            text = page["text"]
+            if not text.strip():
+                continue
+            matches = list(Q_SPLIT.finditer(text))
+            if not matches:
+                # No Q marker: continuation of pending Q, else whole-page chunk.
+                if pending is not None:
+                    pno, ptext = pending
+                    pending = (pno, (ptext + "\n" + text.strip()).strip()[:4000])
+                elif text.strip():
+                    chunks.append((page["page_no"], text.strip()[:2000]))
+                continue
+            # Preamble before first Q marker (instructions) — keep, don't drop.
+            pre = text[: matches[0].start()].strip()
+            if pre:
+                if pending is not None:
+                    pno, ptext = pending
+                    pending = (pno, (ptext + "\n" + pre).strip()[:4000])
+                    _flush_pending()
+                else:
+                    chunks.append((page["page_no"], pre[:2000]))
+            for idx, m in enumerate(matches):
+                num = _qnum(m)
+                end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
+                body = text[m.end() : end].strip()
+                qtext = f"Q{num} {body}".strip()
+                if idx == len(matches) - 1:
+                    # Last Q on page may continue next page — hold as pending.
+                    if pending is not None:
+                        _flush_pending()
+                    pending = (page["page_no"], qtext)
+                else:
+                    if pending is not None:
+                        _flush_pending()
+                    chunks.append((page["page_no"], qtext))
+        _flush_pending()
+
+        per_exam_counts.append({
+            "file": rel,
+            "questions_found": len(chunks),
+            "pages": data["total_pages"],
+            "truncated": bool(data.get("truncated")),
+        })
         for page_no, qtext in chunks:
             qtype = _classify_type(qtext)
             diff = _guess_difficulty(qtext)
@@ -120,6 +179,7 @@ def analyze_course(course_dir: Path, max_pages_per_exam: int = 50) -> dict:
                 "file": rel, "page": page_no, "type": qtype,
                 "difficulty": diff, "marks": mark_val,
                 "preview": qtext[:200],
+                "text": qtext,
             })
 
     total = len(questions)
@@ -133,12 +193,21 @@ def analyze_course(course_dir: Path, max_pages_per_exam: int = 50) -> dict:
         })
         if templates:
             top_t = templates.most_common(3)
-            # cite one example per template
+            # cite one real example per template (match regex against full text)
             tsources = []
+            rx_by_name = {name: rx for name, rx in TEMPLATES}
             for name, _ in top_t:
-                for q in questions:
-                    tsources.append(f"{q['file']}:p{q['page']}")
-                    break
+                rx = rx_by_name.get(name)
+                example = None
+                if rx is not None:
+                    for q in questions:
+                        if rx.search(q.get("text", q["preview"])):
+                            example = q
+                            break
+                if example is None and questions:
+                    example = questions[0]
+                if example is not None:
+                    tsources.append(f"{example['file']}:p{example['page']}")
             findings.append({
                 "claim": f"Recurring wording patterns: {', '.join(f'{k} x{v}' for k, v in top_t)}.",
                 "sources": tsources[:3],

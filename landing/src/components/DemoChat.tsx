@@ -81,12 +81,12 @@ export function DemoChat() {
             <span className="rounded-full bg-sun-soft px-2.5 py-1 text-xs font-semibold text-ink">
               {t.demo.illustrative}
             </span>
-            <button onClick={replay} className="flex items-center gap-1 text-xs font-semibold text-navy hover:underline">
+            <button onClick={replay} className="flex min-h-[44px] min-w-[44px] items-center gap-1 px-2 py-2 text-xs font-semibold text-navy hover:underline">
               <RotateCcw className="h-3.5 w-3.5" /> {t.demo.replay}
             </button>
           </div>
         </div>
-        <div className="space-y-4 p-5 sm:p-6" aria-live="polite">
+        <div className="space-y-4 p-5 sm:p-6" aria-live="off">
           <div className="flex gap-3">
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-mist">
               <User className="h-4 w-4 text-navy" />
@@ -100,9 +100,9 @@ export function DemoChat() {
             const last = i === visible - 1 && visible <= t.demo.steps.length;
             return (
               <motion.div
-                key={i}
-                initial={reduced ? false : { opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
+                key={`${lang}-${i}`}
+                initial={reduced ? false : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-3 ps-11 text-[15px] text-muted"
               >
                 {done ? (
@@ -121,8 +121,10 @@ export function DemoChat() {
             <motion.div
               initial={reduced ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="ms-11 rounded-2xl border-2 border-sun bg-sun-soft/60 px-4 py-3 font-mono text-[13px] text-ink"
+              className="code-ltr ms-11 rounded-2xl border-2 border-sun bg-sun-soft/60 px-4 py-3 font-mono text-[13px] text-ink"
               dir="ltr"
+              role="status"
+              aria-live="polite"
             >
               ✓ {t.demo.done}
             </motion.div>

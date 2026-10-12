@@ -19,6 +19,8 @@ export function Faq() {
       >
         {t.faq.items.map((item, i) => {
           const isOpen = open === i;
+          const panelId = `faq-panel-${i}`;
+          const btnId = `faq-button-${i}`;
           return (
             <div
               key={i}
@@ -27,9 +29,11 @@ export function Faq() {
               }`}
             >
               <button
+                id={btnId}
                 onClick={() => setOpen(isOpen ? null : i)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-4 p-5 text-start"
+                aria-controls={panelId}
+                className="flex min-h-[44px] w-full items-center justify-between gap-4 p-5 text-start"
               >
                 <span className="font-display font-bold text-ink">{item.q}</span>
                 <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.25 }}>
@@ -39,6 +43,9 @@ export function Faq() {
               <AnimatePresence initial={false}>
                 {isOpen && (
                   <motion.div
+                    id={panelId}
+                    role="region"
+                    aria-labelledby={btnId}
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}

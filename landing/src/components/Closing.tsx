@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
-import { GITHUB_URL } from "../config";
+import { CONTACT_EMAIL, GITHUB_URL } from "../config";
 import { useLang } from "../i18n";
 import { fadeUp } from "../motion/variants";
 import { GithubCta } from "./Navbar";
@@ -74,7 +74,7 @@ export function Footer() {
           ) : (
             <span className="text-muted">{t.footer.contribute}</span>
           )}
-          <a href="mailto:moja3222@gmail.com?subject=Sentra%20suggestion" className="text-navy hover:underline">
+          <a href={`mailto:${CONTACT_EMAIL}?subject=Sentra%20suggestion`} className="text-navy hover:underline">
             {t.footer.contact}
           </a>
         </nav>

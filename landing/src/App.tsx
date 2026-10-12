@@ -1,3 +1,4 @@
+import { MotionConfig } from "motion/react";
 import { LangProvider } from "./i18n";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
@@ -12,6 +13,7 @@ import { FinalCta, Footer } from "./components/Closing";
 
 export default function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <LangProvider>
       <Navbar />
       <main>
@@ -27,5 +29,6 @@ export default function App() {
       </main>
       <Footer />
     </LangProvider>
+    </MotionConfig>
   );
 }

@@ -13,6 +13,8 @@ export const AGENT_SENTENCE = "download and run this mcp";
 export const OPENCODE_DOCS_URL = "https://opencode.ai/docs/mcp-servers/";
 export const MCP_SDK_URL = "https://github.com/modelcontextprotocol/python-sdk";
 
+export const CONTACT_EMAIL = "moja3222@gmail.com";
+
 export const INSTALL_COMMANDS = {
   installUvWin: "winget install -e --id astral-sh.uv",
   installUvAlt: "pip install uv",

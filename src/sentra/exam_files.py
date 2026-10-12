@@ -14,11 +14,22 @@ class ExamFileError(ValueError):
     pass
 
 
+WINDOWS_RESERVED = {
+    "CON", "PRN", "AUX", "NUL",
+    "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+    "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+}
+
+
 def sanitize_basename(basename: str) -> str:
     if not BASENAME_RX.match(basename or ""):
         raise ExamFileError(
             "basename must be 1-64 chars: letters, digits, '_' or '-', starting alphanumeric "
             "(e.g. 'os_midterm_mock1')."
+        )
+    if basename.upper() in WINDOWS_RESERVED:
+        raise ExamFileError(
+            f"basename '{basename}' is a reserved device name on Windows."
         )
     return basename
 
@@ -29,7 +40,18 @@ def validate_pair(exam_markdown: str, answer_key_markdown: str) -> list[str]:
         raise ExamFileError("exam_markdown is too short (<50 chars). Generate real questions first.")
     if not answer_key_markdown or len(answer_key_markdown.strip()) < 50:
         raise ExamFileError("answer_key_markdown is too short (<50 chars).")
-    if "answer key" in exam_markdown.lower():
+    if len(exam_markdown.encode("utf-8")) > settings.MAX_EXAM_MD_BYTES:
+        raise ExamFileError(
+            f"exam_markdown exceeds {settings.MAX_EXAM_MD_BYTES} byte limit."
+        )
+    if len(answer_key_markdown.encode("utf-8")) > settings.MAX_EXAM_MD_BYTES:
+        raise ExamFileError(
+            f"answer_key_markdown exceeds {settings.MAX_EXAM_MD_BYTES} byte limit."
+        )
+    low = exam_markdown.lower()
+    # Block answer leakage in student file: "answer key", "answer(s):",
+    # "solution:", "marking scheme". Conservative on purpose.
+    if re.search(r"\banswer\s*keys?\b|\banswers?\s*:|\bsolutions?\s*:|\bmarking\s+schemes?\b", low):
         raise ExamFileError(
             "Separation violation: student exam file must NOT contain an answer key. "
             "Keep answers in the separate answer-key file."
@@ -66,7 +88,7 @@ def save_pair(
         except ValueError:
             raise ExamFileError(f"Output path escapes course dir: {p}")
     if not overwrite and (exam_path.exists() or key_path.exists()):
-        existing = [str(p) for p in (exam_path, key_path) if p.exists()]
+        existing = [p.name for p in (exam_path, key_path) if p.exists()]
         raise ExamFileError(
             f"Refusing to overwrite existing files: {existing}. "
             "Choose a new basename or pass overwrite=true explicitly."

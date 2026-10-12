@@ -23,6 +23,12 @@ def extract_pages(
     Streams only requested pages, caps output. Treats content as untrusted
     data (never executed). Raises PDFReadError with useful messages.
     """
+    # Strict type validation: direct-API callers may pass str/float/None.
+    # (MCP layer already enforces ge=1 via Pydantic, but fail closed here too.)
+    if isinstance(page_start, bool) or not isinstance(page_start, int):
+        raise PDFReadError("page_start must be an integer >= 1.")
+    if page_end is not None and (isinstance(page_end, bool) or not isinstance(page_end, int)):
+        raise PDFReadError("page_end must be an integer >= page_start.")
     if page_start < 1:
         raise PDFReadError("page_start must be >= 1.")
     if page_end is not None and page_end < page_start:
@@ -48,14 +54,30 @@ def extract_pages(
         total = doc.page_count
         if total == 0:
             raise PDFReadError(f"File '{pdf_path.name}' has 0 pages.")
+        # Encrypted PDFs need a password — don't misreport as scanned blank.
+        try:
+            if getattr(doc, "is_encrypted", False) or getattr(doc, "needs_pass", False):
+                raise PDFReadError(
+                    f"File '{pdf_path.name}' is encrypted and needs a password."
+                )
+        except PDFReadError:
+            raise
+        except Exception:
+            pass
+        if page_start > total:
+            raise PDFReadError(
+                f"page_start {page_start} exceeds total pages {total}."
+            )
         end = page_end or total
         end = min(end, total)
+        requested = end - page_start + 1
         # Enforce per-call page cap to avoid loading huge docs into the model context.
-        if end - page_start + 1 > settings.MAX_PAGES_PER_CALL:
+        # truncated=True ONLY when the cap forces fewer pages than requested.
+        if requested > settings.MAX_PAGES_PER_CALL:
             end = page_start + settings.MAX_PAGES_PER_CALL - 1
             truncated_pages = True
         else:
-            truncated_pages = end < total
+            truncated_pages = False
 
         pages: list[dict] = []
         chars = 0
@@ -64,10 +86,18 @@ def extract_pages(
             try:
                 text = doc[i].get_text("text") or ""
             except Exception:
+                # get_text raises on encrypted docs; already guarded above,
+                # but fail closed per-page rather than masking as blank.
+                if "encrypt" in str(getattr(doc, "is_encrypted", "")).lower():
+                    raise PDFReadError(f"File '{pdf_path.name}' is encrypted.")
                 text = ""
             # Char cap: cut off mid-document rather than blow the context.
+            # Don't append a trailing empty page when budget is exhausted.
             if chars + len(text) > settings.MAX_CHARS_PER_CALL:
                 keep = max(0, settings.MAX_CHARS_PER_CALL - chars)
+                if keep == 0:
+                    truncated_chars = True
+                    break
                 text = text[:keep]
                 truncated_chars = True
                 pages.append(_page_entry(i + 1, text))

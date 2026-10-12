@@ -27,7 +27,7 @@ export function WhatIs() {
         >
           <motion.div variants={staggerChild} className="rounded-2xl border border-line bg-white p-5">
             <div className="flex items-center gap-2 font-semibold text-navy">
-              <FileSearch className="h-5 w-5 text-sky" /> {t.what.mcpTitle}
+              <FileSearch className="h-5 w-5 text-navy" aria-hidden="true" /> {t.what.mcpTitle}
             </div>
             <p className="mt-2 text-[15px] leading-relaxed text-muted">{t.what.mcpBody}</p>
           </motion.div>
@@ -40,8 +40,8 @@ export function WhatIs() {
         </motion.div>
       </div>
       <div className="mt-6 flex items-center gap-2 text-sm text-muted">
-        <BookOpenText className="h-4 w-4 text-sky" aria-hidden="true" />
-        <span dir="ltr" className="font-mono text-[13px]">
+        <BookOpenText className="h-4 w-4 text-navy" aria-hidden="true" />
+        <span dir="ltr" className="code-ltr font-mono text-[13px]">
           lectures/*.pdf → analyze → output/*_exam.md + *_answers.md
         </span>
       </div>

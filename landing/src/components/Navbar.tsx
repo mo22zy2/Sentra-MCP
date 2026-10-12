@@ -6,20 +6,24 @@ import { useLang } from "../i18n";
 import { Logo } from "./Section";
 
 const LINKS = [
+  { href: "#what", key: "what" },
   { href: "#features", key: "features" },
   { href: "#how", key: "how" },
+  { href: "#demo", key: "demo" },
   { href: "#quickstart", key: "quick" },
   { href: "#install", key: "install" },
   { href: "#faq", key: "faq" },
 ] as const;
 
-export function GithubCta({ variant = "nav" }: { variant?: "nav" | "hero" | "cta" }) {
+export function GithubCta({ variant = "nav" }: { variant?: "nav" | "hero" | "cta" | "drawer" }) {
   const { t } = useLang();
   const ready = GITHUB_URL.length > 0;
   const cls =
     variant === "nav"
       ? "hidden items-center gap-2 rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-navy-deep sm:inline-flex"
-      : variant === "hero"
+      : variant === "drawer"
+        ? "inline-flex items-center gap-2 rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-deep"
+        : variant === "hero"
         ? "inline-flex items-center gap-2 rounded-xl border-2 border-navy bg-white px-6 py-3.5 font-semibold text-navy transition-colors hover:bg-mist"
         : "inline-flex items-center gap-2 rounded-xl border-2 border-navy bg-white px-6 py-3.5 font-semibold text-navy transition-colors hover:bg-mist";
 
@@ -48,7 +52,7 @@ export function LangSwitch() {
           key={l}
           onClick={() => setLang(l)}
           aria-pressed={lang === l}
-          className={`rounded-lg px-2.5 py-1 transition-colors ${
+          className={`min-h-[44px] min-w-[44px] rounded-lg px-3.5 py-2 transition-colors ${
             lang === l ? "bg-navy text-white" : "text-muted hover:text-navy"
           }`}
         >
@@ -91,9 +95,10 @@ export function Navbar() {
           <GithubCta variant="nav" />
         </div>
         <button
-          className="rounded-lg p-2 text-navy md:hidden"
+          className="min-h-[44px] min-w-[44px] rounded-lg p-2.5 text-navy md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
+          aria-controls="mobile-menu"
           aria-label={open ? t.nav.close : t.nav.menu}
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -102,6 +107,7 @@ export function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="mobile-menu"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -110,13 +116,13 @@ export function Navbar() {
           >
             <div className="flex flex-col gap-4 px-5 py-5">
               {LINKS.map((l) => (
-                <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="text-base font-medium text-ink">
+                <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="min-h-[44px] content-center text-base font-medium text-ink">
                   {t.nav[l.key]}
                 </a>
               ))}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <LangSwitch />
-                <GithubCta variant="nav" />
+                <GithubCta variant="drawer" />
               </div>
             </div>
           </motion.div>

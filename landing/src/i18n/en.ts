@@ -1,8 +1,10 @@
 export const en = {
   meta: { name: "English", short: "EN" },
   nav: {
+    what: "What",
     features: "Features",
     how: "How It Works",
+    demo: "Demo",
     quick: "Quick Start",
     install: "Installation",
     faq: "FAQ",
