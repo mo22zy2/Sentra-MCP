@@ -7,7 +7,7 @@
  */
 export const GITHUB_URL: string = "https://github.com/mo22zy2/Sentra-MCP";
 
-/** The exact sentence the student pastes into OpenCode next to the link. */
+/** The exact sentence the student pastes into their AI agent next to the link. */
 export const AGENT_SENTENCE = "download and run this mcp";
 
 /** Every supported AI agent: official download + docs (both verified) and
@@ -26,13 +26,11 @@ export const MCP_SDK_URL = "https://github.com/modelcontextprotocol/python-sdk";
 export const CONTACT_EMAIL = "moja3222@gmail.com";
 
 /**
- * Direct-send contact form. Create a free form endpoint and paste it here:
- * - Formspree:  "https://formspree.io/f/YOUR_FORM_ID" (mode: "formspree")
- * - Web3Forms:  "https://api.web3forms.com/submit" + access key below
- * Until a real endpoint is set, the form falls back to opening the
- * visitor's mail app with a prefilled message (mailto).
+ * Direct-send contact form (Formspree by default; Web3Forms needs its mode
+ * + access key below). If the endpoint ever goes blank/placeholder again,
+ * the form falls back to opening the visitor's mail app (mailto).
  */
-export const CONTACT_FORM_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
+export const CONTACT_FORM_ENDPOINT = "https://formspree.io/f/xzedvyqo";
 export const CONTACT_FORM_MODE: "formspree" | "web3forms" = "formspree";
 export const CONTACT_FORM_KEY = ""; // Web3Forms access key (only for web3forms mode)
 
@@ -54,7 +52,7 @@ export const OPENCODE_CONFIG_JSON = `{
   }
 }`;
 
-export const FOLDER_TREE = `Course-Folder/   (the folder opened in OpenCode)
+export const FOLDER_TREE = `Course-Folder/   (the folder opened in your AI agent)
 ├── lectures/
 │   └── lecture_01.pdf
 ├── past_exams/

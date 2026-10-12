@@ -80,7 +80,7 @@ export function DemoChat() {
       >
         <div className="flex items-center justify-between border-b border-line bg-mist/70 px-5 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-navy">
-            <Bot className="h-4 w-4" /> OpenCode · sentra
+            <Bot className="h-4 w-4" /> {t.demo.agentLabel} · sentra
           </div>
           <div className="flex items-center gap-3">
             <span className="rounded-full bg-sun-soft px-2.5 py-1 text-xs font-semibold text-ink">

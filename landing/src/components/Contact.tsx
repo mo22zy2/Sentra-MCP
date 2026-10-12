@@ -92,8 +92,6 @@ export function Contact() {
             <label className="block">
               <span className="mb-1.5 block text-sm font-semibold text-ink">{t.contact.message}</span>
               <textarea
-                required
-                minLength={10}
                 rows={5}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}

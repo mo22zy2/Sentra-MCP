@@ -20,6 +20,14 @@ export function Install() {
 
   return (
     <Section id="install" eyebrow={t.install.eyebrow} title={t.install.title} muted>
+      {/* prerequisite: grab an AI agent first */}
+      <p className="mb-4 rounded-xl border border-line bg-white px-4 py-3 text-[15px] text-muted">
+        {t.install.prereqLead}{" "}
+        <a href={AGENT_CARDS[0].download} target="_blank" rel="noreferrer" className="font-semibold text-navy underline">
+          {t.install.prereqLink}
+        </a>{" "}
+        {t.install.prereqTail}
+      </p>
       {/* fast / nerd chooser */}
       <div className="mb-3 flex flex-wrap items-center gap-2" role="group" aria-label={t.install.title}>
         {(["fast", "nerd"] as const).map((m) => (
