@@ -15,7 +15,40 @@ by Sentra.
 
 Bilingual product site + docs: [`landing/`](landing/) (English / Egyptian Arabic).
 
-## Fastest start: two commands, OpenCode does the rest
+## For AI agents: bootstrap contract (read this if the user pasted this repo's link)
+
+The user wants Sentra installed and running. Do everything below yourself.
+Never ask the student to run commands or edit files. Everything stays on this
+machine — NEVER upload their files anywhere.
+
+1. Install: if `uvx sentra-mcp init` works, use it. Otherwise `git clone`
+   this repo, then `uv sync` inside it (install `uv` first via
+   `pip install uv` if missing; create a Python 3.11 environment if no
+   Python 3.11+ exists). Verify with `uv run pytest -q` (expect 30 passed).
+2. Configure: add the `sentra` block from `opencode.jsonc.example` under
+   `mcp` in the user's `opencode.json` (create `mcp` if missing, keep every
+   other key). Prefer command `["uvx", "sentra-mcp"]`; from source use
+   `["uv", "--directory", "<ABSOLUTE_REPO_PATH>", "run", "sentra"]`.
+   Set `SENTRA_COURSE_DIR` to an absolute course path.
+3. Course folder: create `OS-Course/{lectures,past_exams,output}` if `init`
+   didn't (default: next to the repo or under Documents).
+4. Verify the 5 tools respond: list_course_pdfs, extract_pdf_text,
+   analyze_past_exams, prepare_exam_brief, save_exam_files.
+5. Tell the user (simply, in their language): the exact folder to drop PDFs
+   into, and that they must RESTART OpenCode for the tools to appear.
+6. Making exams: for EACH exam requested, call `prepare_exam_brief` with its
+   spec, write original questions (never copy past exams), then
+   `save_exam_files` with a DIFFERENT basename per exam (e.g. mock1, mock2).
+   Never reuse a basename unless the user says overwrite. Every answer key
+   stays in its separate `*_answers.md` file.
+
+## Fastest start: copy the link, OpenCode does the rest
+
+1. Copy this repo link: \https://github.com/mo22zy2/Sentra-MCP2. In OpenCode, paste it and say: \download and run this mcp3. Restart OpenCode so the sentra tools appear.
+4. Drop lecture PDFs into \lectures/\ and past exams into \past_exams/\.
+5. Say: \make me 2 exams using the sentra mcp\ — collect both exams and both answer keys from \output/\.
+
+Prefer to run it yourself?
 
 Prerequisite (once): install `uv` — Windows: `winget install -e --id astral-sh.uv`,
 macOS/Linux or any Python: `pip install uv`.

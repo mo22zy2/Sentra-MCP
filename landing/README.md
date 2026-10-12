@@ -15,8 +15,8 @@ npm run build    # production build → dist/
 ## Notes
 
 - `src/config.ts` — `GITHUB_URL` is the single source of truth for the repo
-  link (currently `https://github.com/mo22zy2/Sentra-MCP`). The bootstrap
-  prompt (`BOOTSTRAP_PROMPT`) injects it automatically. Never hardcode the
+  link (currently `https://github.com/mo22zy2/Sentra-MCP`). The QuickStart
+  journey (copy-link + agent sentence) derives from it. Never hardcode the
   URL elsewhere.
 - Install commands and the OpenCode JSON mirror the root `README.md` and
   `opencode.jsonc.example` verbatim. If those change, update `src/config.ts`.

@@ -132,5 +132,7 @@ def run_init(course_dir: str | None = None, config: str | None = None) -> int:
     print(f"2. OpenCode config updated: {info['config_path']}")
     if info["backup_path"]:
         print(f"   Your previous config was backed up to: {info['backup_path']}")
-    print("3. Open OpenCode, then ask: 'Analyze the previous exams and summarize the professor's question patterns.'")
+    print("3. IMPORTANT: restart OpenCode now so the sentra tools appear.")
+    print("4. Then ask: 'Make me 2 exams using the sentra mcp.'")
+    print("   Each exam is saved separately under output/ with its own answer key.")
     return 0

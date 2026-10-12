@@ -97,11 +97,17 @@ export const ar: Dict = {
   },
   quickstart: {
     eyebrow: "من غير أي تجهيز",
-    title: "انسخ رسالة واحدة. وOpenCode هيعمل الباقي.",
-    body1:
-      "مش محتاج تمشي على الخطوات اللي تحت. انسخ الرسالة والصقها في OpenCode، والـ agent هينزّل Sentra ويسطّبه ويظبط كل حاجة على جهازك ويتأكد إنها شغالة.",
-    body2: "مفيش أي حاجة بتترفع على النت — كل حاجة بتشتغل على جهازك.",
-    promptLabel: "الصقها في OpenCode",
+    title: "انسخ اللينك. وقول لـ OpenCode يشغّله.",
+    journey: [
+      "انسخ لينك Sentra من الصفحة دي.",
+      "في OpenCode، الصق اللينك وقول: download and run this mcp.",
+      "ريستارت OpenCode عشان أدوات sentra تظهر.",
+      "حط محاضرات الـ PDF والامتحانات القديمة في الفولدر اللي اتعمل.",
+      "قول: make me 2 exams using the sentra mcp — واستلم الملفات من output/.",
+    ],
+    linkLabel: "لينك المستودع",
+    sayLabel: "قول كده في OpenCode",
+    note: "من غير أي تجهيز0",
   },
   install: {
     eyebrow: "طريقة التحميل والتشغيل",

@@ -95,11 +95,17 @@ export const en = {
   },
   quickstart: {
     eyebrow: "Zero setup",
-    title: "Copy one prompt. OpenCode does the rest.",
-    body1:
-      "Skip the steps below. Copy the prompt, paste it into OpenCode, and the agent will download Sentra, install it, configure everything on your machine, and verify it works.",
-    body2: "Nothing is uploaded anywhere — everything runs on your computer.",
-    promptLabel: "Paste into OpenCode",
+    title: "Copy the link. Tell OpenCode to run it.",
+    journey: [
+      "Copy the Sentra link from this page.",
+      "In OpenCode, paste it and say: download and run this mcp.",
+      "Restart OpenCode so the sentra tools appear.",
+      "Drop lecture PDFs and past exams into the folder it made.",
+      "Say: make me 2 exams using the sentra mcp -- collect both files from output/.",
+    ],
+    linkLabel: "Repo link",
+    sayLabel: "Say this in OpenCode",
+    note: "The agent does the setup -- you only copy, paste, and restart. Nothing is uploaded anywhere; everything runs on your computer.",
   },
   install: {
     eyebrow: "Installation guide",
