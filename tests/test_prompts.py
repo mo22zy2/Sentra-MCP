@@ -74,6 +74,9 @@ def test_pipeline_order_and_next():
     ]
     assert workflow_prompts.next_step("knowledge_base") == "professor_dna"
     assert workflow_prompts.next_step("predicted_exam") is None
+    assert workflow_prompts.prompt_for_output("knowledge_base.md") == "knowledge_base"
+    assert workflow_prompts.next_step_after_output("knowledge_base.md") == "professor_dna"
+    assert workflow_prompts.next_step_after_output("predicted_exam.md") is None
     described = workflow_prompts.describe_pipeline()
     assert [s["name"] for s in described] == workflow_prompts.PIPELINE_ORDER
     assert described[1]["writes"] == "knowledge_base.md"
@@ -123,7 +126,11 @@ def test_workflow_tools_registered_and_roundtrip(course_dir):
     spayload = _payload(started)
     assert spayload["first"]["name"] == "extract_text"
     assert "pipeline" in spayload and spayload["lectures"]
-    assert _payload(saved)["path"] == "output/knowledge_base.md"
+    saved_payload = _payload(saved)
+    assert saved_payload["path"] == "output/knowledge_base.md"
+    assert saved_payload["next"]["name"] == "professor_dna"
+    assert saved_payload["next"]["writes"] == "professor_dna.md"
+    assert "professor_dna.md" in saved_payload["next"]["text"]
     assert bad.is_error is True
 
 

@@ -9,6 +9,7 @@ Never uploads anything anywhere.
 from __future__ import annotations
 
 import datetime as _dt
+import copy
 import json
 import os
 import shutil
@@ -48,23 +49,36 @@ def _load_json(config_path: Path, agent_name: str, backup_path: str | None) -> d
     return data
 
 
+def _load_existing_json(config_path: Path, agent_name: str) -> tuple[dict, str | None]:
+    if not config_path.is_file():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        return {}, None
+    try:
+        return _load_json(config_path, agent_name, None), None
+    except InitError as exc:
+        backup_path = _backup(config_path)
+        raise InitError(f"{exc} A backup was saved at {backup_path}.")
+
+
 def merge_file(agent_id: str, config_path: Path) -> dict:
     """Merge the sentra entry into config_path using the agent's own format."""
     spec = agents.AGENTS[agent_id]
-    backup_path = _backup(config_path) if config_path.is_file() else None
-    if backup_path is None:
-        config_path.parent.mkdir(parents=True, exist_ok=True)
-        data: dict = {}
-    else:
-        data = _load_json(config_path, spec["name"], backup_path)
+    data, backup_path = _load_existing_json(config_path, spec["name"])
+    before = copy.deepcopy(data)
     try:
         spec["merge"](data)
     except ValueError as exc:
+        if config_path.is_file() and backup_path is None:
+            backup_path = _backup(config_path)
         raise InitError(
             f"Cannot merge into {config_path}: {exc}. "
             + (f"A backup was saved at {backup_path}. " if backup_path else "")
             + "Fix it, then run init again."
         )
+    if data == before:
+        return {"config_path": str(config_path), "backup_path": None, "merged": False}
+    if config_path.is_file() and backup_path is None:
+        backup_path = _backup(config_path)
     config_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return {"config_path": str(config_path), "backup_path": backup_path, "merged": True}
 
@@ -116,23 +130,25 @@ def opencode_block(course_dir: Path | None) -> dict:
 
 def merge_opencode(config_path: Path, course_dir: Path | None) -> dict:
     """Legacy opencode merge (kept; same behavior as before)."""
-    backup_path = _backup(config_path) if config_path.is_file() else None
-    if backup_path is None:
-        config_path.parent.mkdir(parents=True, exist_ok=True)
-        data: dict = {}
-    else:
-        data = _load_json(config_path, "OpenCode", backup_path)
+    data, backup_path = _load_existing_json(config_path, "OpenCode")
+    before = copy.deepcopy(data)
     node = data.get("mcp")
     if node is None:
         node = {}
         data["mcp"] = node
     if not isinstance(node, dict):
+        if config_path.is_file() and backup_path is None:
+            backup_path = _backup(config_path)
         raise InitError(
             f'Your OpenCode config at {config_path} has an "mcp" key that is not an object. '
             + (f"A backup was saved at {backup_path}. " if backup_path else "")
             + "Fix it, then run init again."
         )
     node["sentra"] = opencode_block(course_dir)
+    if data == before:
+        return {"config_path": str(config_path), "backup_path": None, "merged": False}
+    if config_path.is_file() and backup_path is None:
+        backup_path = _backup(config_path)
     config_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return {"config_path": str(config_path), "backup_path": backup_path, "merged": True}
 

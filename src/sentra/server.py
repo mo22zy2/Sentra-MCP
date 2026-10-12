@@ -122,7 +122,20 @@ def save_pipeline_file(
     course dir, no silent overwrite.
     """
     course = course_store.resolve_course_dir(course_dir)
-    return pipeline_files.save_pipeline_markdown(course, filename, markdown, overwrite)
+    result = pipeline_files.save_pipeline_markdown(course, filename, markdown, overwrite)
+    next_name = workflow_prompts.next_step_after_output(filename)
+    if next_name is None:
+        result["next"] = None
+    else:
+        result["next"] = {
+            "name": next_name,
+            "writes": next(
+                (s["writes"] for s in workflow_prompts.describe_pipeline() if s["name"] == next_name),
+                None,
+            ),
+            "text": workflow_prompts.get_prompt_text(next_name),
+        }
+    return result
 
 
 @mcp.tool()

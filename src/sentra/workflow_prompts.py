@@ -37,6 +37,12 @@ _WRITES: dict[str, str | None] = {
     "predicted_exam": "predicted_exam.md",
 }
 
+_OUTPUT_TO_PROMPT: dict[str, str] = {
+    output: name
+    for name, output in _WRITES.items()
+    if output is not None
+}
+
 _DESCRIBE: dict[str, str] = {
     "extract_text": "Step 1: how to read every PDF faithfully before anything else.",
     "knowledge_base": "Step 2: build knowledge_base.md from lectures (complete, not summary).",
@@ -99,6 +105,17 @@ def next_step(name: str) -> str | None:
     if idx + 1 < len(PIPELINE_ORDER):
         return PIPELINE_ORDER[idx + 1]
     return None
+
+
+def prompt_for_output(filename: str) -> str | None:
+    return _OUTPUT_TO_PROMPT.get(filename)
+
+
+def next_step_after_output(filename: str) -> str | None:
+    name = prompt_for_output(filename)
+    if name is None:
+        return None
+    return next_step(name)
 
 
 def describe_pipeline() -> list[dict]:

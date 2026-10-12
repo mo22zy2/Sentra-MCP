@@ -50,7 +50,7 @@ Prompts are the core and run in order. Tools only supply evidence.
 | `start_pipeline` | File listing + ordered steps + step-1 prompt in one call. |
 | `list_workflow_prompts` | Ordered prompt list with output files. |
 | `get_workflow_prompt` | One prompt verbatim + `writes`/`next`. |
-| `save_pipeline_file` | Saves the pipeline `.md` files. Schemaless: only checks name, non-empty, 1MB cap, no silent overwrite. |
+| `save_pipeline_file` | Saves the pipeline `.md` files and returns the next prompt when there is one. Schemaless: only checks name, non-empty, 1MB cap, no silent overwrite. |
 | `list_course_pdfs` | Lists PDFs, reports unreadable files. |
 | `extract_pdf_text` | Page-numbered text (50 pages / 60k chars per call). Scanned PDFs return `insufficient_text`. |
 | `analyze_past_exams` | Counts + `file:page` cites for `professor_dna`. |
@@ -98,7 +98,7 @@ NEVER upload their files anywhere.
 2. Configure with `init --agent <id>` if the user named an agent, else default `init`.
 3. Course folder = the opened folder. Tell the user where to drop PDFs, in their language.
 4. Verify with `list_workflow_prompts` (5 prompts), then tell the user to RESTART their agent.
-5. Run `start_pipeline`, then the prompts in order, saving each with `save_pipeline_file`.
+5. Run `start_pipeline`, then the prompts in order, saving each with `save_pipeline_file` and following its returned `next` prompt.
    For each mock exam: `prepare_exam_brief`, write original questions only (never copy
    past exams), then `save_exam_files` with a DIFFERENT basename per exam. Answer keys
    stay in separate `*_answers.md` files.
