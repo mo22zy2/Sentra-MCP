@@ -18,14 +18,23 @@ export const AGENT_CARDS = [
   { id: "cursor", name: "Cursor", download: "https://cursor.com/download", docs: "https://cursor.com/docs/mcp", setup: "uvx sentra-mcp init --agent cursor" },
   { id: "vscode", name: "VS Code", download: "https://code.visualstudio.com/download", docs: "https://code.visualstudio.com/docs/agent-customization/mcp-servers", setup: "uvx sentra-mcp init --agent vscode" },
   { id: "gemini", name: "Gemini CLI", download: "https://geminicli.com", docs: "https://geminicli.com/docs/tools/mcp-server/", setup: "uvx sentra-mcp init --agent gemini" },
-  { id: "windsurf", name: "Windsurf", download: "https://windsurf.com", docs: "https://docs.windsurf.com/windsurf/cascade", setup: "uvx sentra-mcp init --agent windsurf" },
-  { id: "cline", name: "Cline", download: "https://cline.bot", docs: "https://docs.cline.bot/mcp/mcp-overview", setup: "uvx sentra-mcp init --agent cline" },
 ] as const;
 
 export const OPENCODE_DOCS_URL = "https://opencode.ai/docs/mcp-servers/";
 export const MCP_SDK_URL = "https://github.com/modelcontextprotocol/python-sdk";
 
 export const CONTACT_EMAIL = "moja3222@gmail.com";
+
+/**
+ * Direct-send contact form. Create a free form endpoint and paste it here:
+ * - Formspree:  "https://formspree.io/f/YOUR_FORM_ID" (mode: "formspree")
+ * - Web3Forms:  "https://api.web3forms.com/submit" + access key below
+ * Until a real endpoint is set, the form falls back to opening the
+ * visitor's mail app with a prefilled message (mailto).
+ */
+export const CONTACT_FORM_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
+export const CONTACT_FORM_MODE: "formspree" | "web3forms" = "formspree";
+export const CONTACT_FORM_KEY = ""; // Web3Forms access key (only for web3forms mode)
 
 export const INSTALL_COMMANDS = {
   installUvWin: "winget install -e --id astral-sh.uv",

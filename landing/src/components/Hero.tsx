@@ -124,6 +124,7 @@ export function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="rounded-3xl border border-line bg-gradient-to-b from-mist/70 to-white p-4 sm:p-6"
+          dir="ltr"
         >
           <PipelineArt />
         </motion.div>

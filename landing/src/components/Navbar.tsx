@@ -9,7 +9,6 @@ const LINKS = [
   { href: "#what", key: "what" },
   { href: "#features", key: "features" },
   { href: "#how", key: "how" },
-  { href: "#agents", key: "agents" },
   { href: "#demo", key: "demo" },
   { href: "#quickstart", key: "quick" },
   { href: "#install", key: "install" },
@@ -21,7 +20,7 @@ export function GithubCta({ variant = "nav" }: { variant?: "nav" | "hero" | "cta
   const ready = GITHUB_URL.length > 0;
   const cls =
     variant === "nav"
-      ? "hidden items-center gap-2 rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-navy-deep sm:inline-flex"
+      ? "hidden items-center gap-2 whitespace-nowrap rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-navy-deep lg:inline-flex"
       : variant === "drawer"
         ? "inline-flex items-center gap-2 rounded-xl bg-navy px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-deep"
         : variant === "hero"
@@ -84,19 +83,19 @@ export function Navbar() {
     >
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8" aria-label="Main">
         <Logo />
-        <div className="hidden items-center gap-7 text-[15px] font-medium text-ink md:flex">
+        <div className="hidden min-w-0 flex-1 items-center justify-center gap-4 overflow-x-auto whitespace-nowrap px-4 text-sm font-medium text-ink lg:flex xl:gap-6 xl:text-[15px]">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="transition-colors hover:text-navy">
+            <a key={l.href} href={l.href} className="shrink-0 transition-colors hover:text-navy">
               {t.nav[l.key]}
             </a>
           ))}
         </div>
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden shrink-0 items-center gap-3 lg:flex">
           <LangSwitch />
           <GithubCta variant="nav" />
         </div>
         <button
-          className="min-h-[44px] min-w-[44px] rounded-lg p-2.5 text-navy md:hidden"
+          className="min-h-[44px] min-w-[44px] rounded-lg p-2.5 text-navy lg:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-menu"
@@ -113,7 +112,7 @@ export function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-b border-line bg-white md:hidden"
+            className="overflow-hidden border-b border-line bg-white lg:hidden"
           >
             <div className="flex flex-col gap-4 px-5 py-5">
               {LINKS.map((l) => (

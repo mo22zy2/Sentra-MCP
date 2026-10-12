@@ -5,11 +5,12 @@ import { Hero } from "./components/Hero";
 import { WhatIs } from "./components/WhatIs";
 import { Features } from "./components/Features";
 import { HowItWorks } from "./components/HowItWorks";
-import { Agents } from "./components/Agents";
 import { DemoChat } from "./components/DemoChat";
 import { QuickStart } from "./components/QuickStart";
 import { Install } from "./components/Install";
 import { Faq } from "./components/Faq";
+import { Contribute } from "./components/Contribute";
+import { Contact } from "./components/Contact";
 import { FinalCta, Footer } from "./components/Closing";
 import { DevAgentBar } from "./components/DevAgentBar";
 
@@ -23,11 +24,12 @@ export default function App() {
         <WhatIs />
         <Features />
         <HowItWorks />
-        <Agents />
         <DemoChat />
         <QuickStart />
         <Install />
         <Faq />
+        <Contribute />
+        <Contact />
         <FinalCta />
       </main>
       <Footer />

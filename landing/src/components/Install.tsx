@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ArrowRight, CheckCircle2, ExternalLink, Wrench, Zap } from "lucide-react";
-import { FOLDER_TREE, INSTALL_COMMANDS, MCP_SDK_URL, OPENCODE_CONFIG_JSON, OPENCODE_DOCS_URL } from "../config";
+import { ArrowLeft, ArrowRight, CheckCircle2, Download, ExternalLink, Wrench, Zap } from "lucide-react";
+import { AGENT_CARDS, FOLDER_TREE, INSTALL_COMMANDS, MCP_SDK_URL, OPENCODE_CONFIG_JSON, OPENCODE_DOCS_URL } from "../config";
 import { useLang } from "../i18n";
 import { fadeUp } from "../motion/variants";
 import { CodeBlock, InlineCopy } from "./CodeBlock";
@@ -118,6 +118,33 @@ export function Install() {
               <p className="mt-3 leading-relaxed text-muted">{t.install.steps[step].body}</p>
 
               <div className="mt-6 space-y-4">
+                {step === 1 && (
+                  <div className="rounded-xl border border-line bg-mist/50 p-4 sm:p-5">
+                    <p className="font-display font-bold text-navy">{t.install.agentTitle}</p>
+                    <p className="mt-1 text-sm text-muted">{t.install.agentHint}</p>
+                    <ul className="mt-4 space-y-3">
+                      {AGENT_CARDS.map((agent, i) => (
+                        <li key={agent.id} className="rounded-xl border border-line bg-white p-4">
+                          <p className="font-semibold text-ink">
+                            {agent.name} <span className="font-normal text-muted">— {t.install.agentBlurbs[i]}</span>
+                          </p>
+                          <div dir="ltr" className="code-ltr mt-2 overflow-x-auto rounded-lg bg-ink px-3 py-2 font-mono text-[12.5px] text-white">
+                            <span className="text-sky">$ </span>
+                            {agent.setup}
+                          </div>
+                          <p className="mt-2 flex items-center gap-4 text-sm font-semibold">
+                            <a href={agent.download} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-navy underline">
+                              <Download className="h-3.5 w-3.5" /> {t.install.download}
+                            </a>
+                            <a href={agent.docs} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-navy underline">
+                              {t.install.docs} <ExternalLink className="inline h-3.5 w-3.5" />
+                            </a>
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 {step === 2 && (
                   <>
                     <CodeBlock label="terminal — Windows" code={INSTALL_COMMANDS.installUvWin} />

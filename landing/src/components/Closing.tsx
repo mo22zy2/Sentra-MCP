@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
-import { CONTACT_EMAIL, GITHUB_URL } from "../config";
+import { GITHUB_URL } from "../config";
 import { useLang } from "../i18n";
 import { fadeUp } from "../motion/variants";
 import { GithubCta } from "./Navbar";
@@ -67,14 +67,10 @@ export function Footer() {
               {t.footer.github} · {t.nav.githubSoon.split("—")[0]}
             </span>
           )}
-          {ready ? (
-            <a href={`${GITHUB_URL}/pulls`} target="_blank" rel="noreferrer" className="text-navy hover:underline">
-              {t.footer.contribute}
-            </a>
-          ) : (
-            <span className="text-muted">{t.footer.contribute}</span>
-          )}
-          <a href={`mailto:${CONTACT_EMAIL}?subject=Sentra%20suggestion`} className="text-navy hover:underline">
+          <a href="#contribute" className="text-navy hover:underline">
+            {t.footer.contribute}
+          </a>
+          <a href="#contact" className="text-navy hover:underline">
             {t.footer.contact}
           </a>
         </nav>

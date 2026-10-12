@@ -58,8 +58,6 @@ h3,
 [data-agent="cursor"] { --color-navy: #0f172a; --color-sun: #38bdf8; --color-sky: #0ea5e9; }
 [data-agent="vscode"] { --color-navy: #1b3a5c; --color-sun: #4aa3f0; --color-sky: #007acc; }
 [data-agent="gemini"] { --color-navy: #1a237e; --color-sun: #8ab4f8; --color-sky: #4285f4; }
-[data-agent="windsurf"] { --color-navy: #134e4a; --color-sun: #2dd4bf; --color-sky: #14b8a6; }
-[data-agent="cline"] { --color-navy: #14532d; --color-sun: #4ade80; --color-sky: #22c55e; }
 
 .code-ltr {
   direction: ltr;

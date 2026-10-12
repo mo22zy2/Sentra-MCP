@@ -10,6 +10,9 @@ export function DemoChat() {
   const [visible, setVisible] = useState(0);
   const [started, setStarted] = useState(false);
   const [reduced, setReduced] = useState(false);
+  // Bumped on every replay (and language change) so step rows remount and
+  // their enter animation actually replays instead of rendering instantly.
+  const [runId, setRunId] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,6 +24,7 @@ export function DemoChat() {
   // when it scrolls into view. No page reload ever needed.
   useEffect(() => {
     setVisible(0);
+    setRunId((id) => id + 1);
     const el = ref.current;
     if (!el) {
       setStarted(false);
@@ -59,6 +63,7 @@ export function DemoChat() {
   }, []);
 
   const replay = () => {
+    setRunId((id) => id + 1);
     setVisible(0);
     setStarted(true);
   };
@@ -100,7 +105,7 @@ export function DemoChat() {
             const last = i === visible - 1 && visible <= t.demo.steps.length;
             return (
               <motion.div
-                key={`${lang}-${i}`}
+                key={`${lang}-${runId}-${i}`}
                 initial={reduced ? false : { opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-3 ps-11 text-[15px] text-muted"
@@ -119,6 +124,7 @@ export function DemoChat() {
           })}
           {visible > t.demo.steps.length && (
             <motion.div
+              key={`${lang}-${runId}-done`}
               initial={reduced ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               className="code-ltr ms-11 rounded-2xl border-2 border-sun bg-sun-soft/60 px-4 py-3 font-mono text-[13px] text-ink"

@@ -11,17 +11,12 @@ Every format below was verified against the agent's official docs:
   (portable .mcp.json with mcpServers; .vscode/mcp.json uses "servers")
 - Gemini CLI: https://geminicli.com/docs/tools/mcp-server/
   (settings.json mcpServers with command+args)
-- Windsurf: ~/.codeium/windsurf/mcp_config.json (mcpServers, stdio identical
-  to Cursor; remote uses serverUrl — we only write stdio)
-- Cline: https://docs.cline.bot/mcp/mcp-overview
-  (cline_mcp_settings.json with mcpServers; `cline mcp add` wizard)
 
 No paths or keys are invented. Anything unverified is documented as such.
 """
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 
@@ -65,12 +60,6 @@ def _merge_vscode_servers(data: dict) -> None:
 
 def _home(*parts: str) -> Path:
     return Path.home().joinpath(*parts)
-
-
-def _codeium_base() -> Path:
-    if os.name == "nt" and os.getenv("USERPROFILE"):
-        return Path(os.getenv("USERPROFILE")) / ".codeium" / "windsurf"
-    return _home(".codeium", "windsurf")
 
 
 AGENTS: dict[str, dict] = {
@@ -120,25 +109,6 @@ AGENTS: dict[str, dict] = {
         "alt": "gemini mcp add sentra -- uvx sentra-mcp",
         "hint": "Check /mcp inside Gemini CLI to confirm connection.",
     },
-    "windsurf": {
-        "name": "Windsurf",
-        "download": "https://windsurf.com",
-        "docs": "https://docs.windsurf.com/windsurf/cascade",
-        "kind": "global",
-        "path_parts": None,  # resolved via _codeium_base() (platform-specific)
-        "merge": _merge_mcp_servers,
-        "hint": "Reload the server list in Cascade after saving.",
-    },
-    "cline": {
-        "name": "Cline",
-        "download": "https://cline.bot",
-        "docs": "https://docs.cline.bot/mcp/mcp-overview",
-        "kind": "global",
-        "path_parts": (".cline", "data", "settings", "cline_mcp_settings.json"),
-        "merge": _merge_mcp_servers,
-        "alt": "cline mcp add sentra -- uvx sentra-mcp",
-        "hint": "Or use Cline's MCP Servers panel instead of editing JSON.",
-    },
 }
 
 AGENT_IDS = tuple(AGENTS)
@@ -156,6 +126,4 @@ def global_file(agent_id: str) -> Path:
     spec = AGENTS[agent_id]
     if spec["kind"] != "global":
         raise ValueError(f"Agent '{agent_id}' is not globally-scoped.")
-    if agent_id == "windsurf":
-        return _codeium_base() / "mcp_config.json"
     return _home(*spec["path_parts"])
